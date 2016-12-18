@@ -68,7 +68,8 @@ class Household(object):
                     raise TypeError('Given membertypes is no List of strings.')
             # If no types are given, random statististics are applied
             else:
-                dataset = ast.literal_eval(open('Households.py').read())
+                dataset = ast.literal_eval(open(
+                    os.path.abspath('Data\\Households.py')).read())
                 key = random.randint(0,len(dataset))
                 members = dataset[key]
             # And return the members as list fo strings
@@ -81,7 +82,8 @@ class Household(object):
             '''
             # Loop through all appliances and pick randomly based on the 
             # rate of ownership.
-            dataset = ast.literal_eval(open('Appliances.py').read())
+            dataset = ast.literal_eval(open(os.path.abspath(
+                'Data\\Appliances.py')).read())
             app_n = []
             for app in dataset:
                 if dataset[app]['type'] == 'appliance':
@@ -317,7 +319,8 @@ class Household(object):
             Simulation of the receptacle loads.
             '''
 
-            dataset = ast.literal_eval(open('Appliances.py').read())
+            dataset = ast.literal_eval(open(os.path.abspath(
+                'Data\\Appliances.py')).read())
             # define number of minutes
             nmin = self.nday * 1440
             # determine all transitions of the appliances depending on the appliance
@@ -362,7 +365,8 @@ class Household(object):
             print ' - Receptacle load is %s kWh' % str(load)
 
             return None
-    
+
+
         def lightingload(self):
             '''
             Simulate use of lighting for residential buildings based on the 
@@ -374,8 +378,7 @@ class Household(object):
             # levels which determine the need for lighting if occupant.
             # The loaded solar data represent the global horizontal radiation
             # at a time-step of 1-minute for Uccle, Belgium
-            os.chdir(r'..\\Data')
-            file = open('Climate\\irradiance.txt','r')
+            file = open(os.path.abspath('Data\\Climate\\irradiance.txt'),'r')
             data_pickle = file.read()
             file.close()
             irr = cPickle.loads(data_pickle)
@@ -449,7 +452,8 @@ class Household(object):
         J.Widen (2009).
         '''
 
-        dataset = ast.literal_eval(open('Appliances.py').read())
+        dataset = ast.literal_eval(open(os.path.abspath(
+            'Data\\Appliances.py')).read())
         # define number of minutes
         nmin = self.nday * 1440
         # determine all transitions of the appliances depending on the appliance

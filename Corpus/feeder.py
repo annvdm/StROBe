@@ -68,8 +68,8 @@ class IDEAS_Feeder(object):
                 dat = var
         #######################################################################
         # and output the array to txt
-        tim = np.linspace(0,31536000,len(dat[0]))
-        dat = np.vstack((tim,dat))
-        hea ='#1 \n double data('+str(int(len(dat[0])))+','+str(self.nBui+1)+')'
+        tim = np.linspace(0, 31536000, len(var))
+        dat = np.vstack((tim, dat))
+        hea ='#1 \n double data('+str(int(len(var)))+','+str(self.nBui+1)+')'
         np.savetxt(fname=variable+'.txt', X=dat.T, header=hea)
 
