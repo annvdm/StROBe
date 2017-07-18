@@ -15,7 +15,7 @@ class IDEAS_Feeder(object):
     The Community class defines a set of hosueholds.
     '''
     
-    def __init__(self, name, nBui, path):
+    def __init__(self, name, nBui, path, sample_time):
         '''
         Create the community based on number of households and simulate for
         output towards IDEAS model.
@@ -29,7 +29,7 @@ class IDEAS_Feeder(object):
         os.chdir(path)
         variables = ['P','Q','QRad','QCon','mDHW','sh_day','sh_bath','sh_night']
         for var in variables:
-            self.output(var)
+            self.output(var, sample_time)
         # and conclude
         print '\n'
         print ' - Feeder %s outputted.' % str(self.name)
@@ -50,7 +50,7 @@ class IDEAS_Feeder(object):
             hou.pickle()
             os.chdir(cwd)
 
-    def output(self, variable):
+    def output(self, variable, sample_time):
         '''
         Output the variable for the dwellings in the feeder as a *.txt readable
         for Modelica.
@@ -70,6 +70,16 @@ class IDEAS_Feeder(object):
         # and output the array to txt
         tim = np.linspace(0, 31536000, len(var))
         dat = np.vstack((tim, dat))
+
+        # Resampling
+        ratio = int(sample_time/(tim[1]-tim[0]))
+        new_len = int(len(var)/ratio)
+        new_dat = np.zeros((dat.shape[0], new_len))
+        for k in range(int(len(var)/ratio)):
+            new_dat[:, k] = np.mean(dat[:, ratio*k:ratio*(k+1)-1], axis=1)
+            new_dat[0, k] = k*sample_time
+
+        # Data to txt
         hea ='#1 \n double data('+str(int(len(var)))+','+str(self.nBui+1)+')'
-        np.savetxt(fname=variable+'.txt', X=dat.T, header=hea)
+        np.savetxt(fname=variable+'.txt', X=new_dat.T, header=hea)
 
