@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-""" 
+"""
 File to test the behaviour of feeder.IDEAS_Feeder()
 """
 import os
@@ -13,10 +13,10 @@ os.chdir('..')
 print os.getcwd()
 
 # Replace this
-resultpath = os.path.abspath('Example\\testFeederOut')
+resultpath = os.path.abspath('Example\\testClusterOut')
 print 'Results saved in: '+resultpath
 
 if not os.path.isdir(resultpath):
     os.mkdir(resultpath)
 
-test = Corpus.feeder.IDEAS_Feeder('test', 2, resultpath, 3600, filter=False, average=True)
+test = Corpus.feeder.IDEAS_cluster({'haarHakker': 2, 'peterslei': 1}, resultpath, 3600, filter=False)
