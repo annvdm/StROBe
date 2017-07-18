@@ -70,7 +70,7 @@ class Household(object):
             else:
                 dataset = ast.literal_eval(open(
                     os.path.abspath('Data\\Households.py')).read())
-                key = random.randint(0,len(dataset))
+                key = random.randint(0, len(dataset))
                 members = dataset[key]
             # And return the members as list fo strings
             return members
@@ -555,6 +555,11 @@ class Household(object):
         Round the simulation by wrapping all data and reduce storage size.
         '''
 
+        if round(np.average(self.sh_settings['dayzone']), 2) != 12:
+            flag = True
+        else:
+            flag = False
+
         #######################################################################
         # first we move and sumarize data to the most upper level.
         self.sh_day = self.sh_settings['dayzone']
@@ -575,7 +580,7 @@ class Household(object):
 
         #######################################################################
         # and end
-        return None
+        return flag
 
     def pickle(self):
         '''
