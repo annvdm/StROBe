@@ -560,16 +560,26 @@ class Household(object):
         else:
             flag = False
 
+        def correct_hour(dat):
+            """
+            Correct strobe data to let it start at midnight instead of 4 am
+            :param dat: Data to be converted (sample time of 1 minute is assumed)
+            :return: Converted data
+            """
+            npoints = 4 * 60  # Number of minutes in 4 hours
+            dat = np.roll(dat, npoints)
+            return dat
+
         #######################################################################
         # first we move and sumarize data to the most upper level.
-        self.sh_day = self.sh_settings['dayzone']
-        self.sh_night = self.sh_settings['nightzone']
-        self.sh_bath = self.sh_settings['bathroom']
-        self.P = self.r_receptacles['P'] + self.r_lighting['P']
-        self.Q = self.r_receptacles['Q'] + self.r_lighting['Q']
-        self.QRad = self.r_receptacles['QRad'] + self.r_lighting['QRad']
-        self.QCon = self.r_receptacles['QCon'] + self.r_lighting['QCon']
-        self.mDHW = self.r_flows['mDHW']
+        self.sh_day = correct_hour(self.sh_settings['dayzone'])
+        self.sh_night = correct_hour(self.sh_settings['nightzone'])
+        self.sh_bath = correct_hour(self.sh_settings['bathroom'])
+        self.P = correct_hour(self.r_receptacles['P'] + self.r_lighting['P'])
+        self.Q = correct_hour(self.r_receptacles['Q'] + self.r_lighting['Q'])
+        self.QRad = correct_hour(self.r_receptacles['QRad'] + self.r_lighting['QRad'])
+        self.QCon = correct_hour(self.r_receptacles['QCon'] + self.r_lighting['QCon'])
+        self.mDHW = correct_hour(self.r_flows['mDHW'])
 
         #######################################################################
         # then we delete the old data structure to save space
@@ -745,3 +755,4 @@ class Equipment(object):
             r_app, n_app = stochastic_flow(self, nday, dow, cluster, occ)
 
         return r_app, n_app
+

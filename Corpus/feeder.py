@@ -10,17 +10,20 @@ import cPickle
 import numpy as np
 import os
 
+
 class IDEAS_cluster:
 
-    def __init__(self, bui_dict, path, sample_time, filter=False):
+    def __init__(self, bui_names, bui_numbers, path, sample_time, filter=False):
         self.feeders = {}
-        self.bui_dict = bui_dict
+        self.bui_numbers = bui_numbers
+        self.buiNames = bui_names
 
         cdir = os.getcwd()
 
-        for key, val in bui_dict.items():
-            print '\n---- Cluster %s ----' % key
-            self.feeders[key] = IDEAS_Feeder(key, val, path, sample_time, filter, True, True)
+        for i, name in enumerate(bui_names):
+            nbui = bui_numbers[i]
+            print '\n---- Cluster %s ----' % name
+            self.feeders[name] = IDEAS_Feeder(name, nbui, path, sample_time, filter, True, True)
             os.chdir(cdir)
 
         os.chdir(path)
@@ -51,7 +54,7 @@ class IDEAS_cluster:
                 new_dat[0, k] = k * sample_time
 
             # Data to txt
-            hea = '#1 \ndouble data(' + str(int(new_len)) + ',' + str(len(self.bui_dict.keys()) + 1) + ')'
+            hea = '#1 \ndouble data(' + str(int(new_len)) + ',' + str(len(self.bui_numbers) + 1) + ')'
 
             np.savetxt(fname=key + '.txt', X=new_dat.T, header=hea, comments='')
 

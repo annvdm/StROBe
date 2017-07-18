@@ -2,7 +2,13 @@
 # -*- coding: utf-8 -*-
 
 """
-File to test the behaviour of feeder.IDEAS_Feeder()
+File to test the behaviour of feeder.IDEAS_Cluster()
+
+Output of script:
+In subfolder Example/testClusterOut txt files are saved:
+Txt-files named: <<var>>_<<cluster_name>>: contain all data of buildings in one cluster
+Txt-files named: <<var>>: contain all aggregated data of all clusters, ordered in alphabetical order
+
 """
 import os
 import Corpus.feeder
@@ -19,4 +25,4 @@ print 'Results saved in: '+resultpath
 if not os.path.isdir(resultpath):
     os.mkdir(resultpath)
 
-test = Corpus.feeder.IDEAS_cluster({'haarHakker': 2, 'peterslei': 1}, resultpath, 3600, filter=False)
+test = Corpus.feeder.IDEAS_cluster(['haarHakker', 'peterslei'], [2, 1], resultpath, 3600, filter=False)
