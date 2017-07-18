@@ -15,7 +15,7 @@ class IDEAS_Feeder(object):
     The Community class defines a set of households.
     """
     
-    def __init__(self, name, nBui, path, sample_time, filter=False):
+    def __init__(self, name, nBui, path, sample_time, filter=False, average=False):
         """
         Create the community based on number of households and simulate for
         output towards IDEAS model.
@@ -24,6 +24,7 @@ class IDEAS_Feeder(object):
         :param path: Path to folder where results are stored
         :param sample_time: Sample time of the profiles, in seconds
         :param filter: If True, profiles with a constant comfort temperature ae removed fro; the output
+        :param average: If True, an average for the group of buildings is calculated and included as the last building in the output file
         """
         self.name = name
         self.nBui = nBui
@@ -34,17 +35,25 @@ class IDEAS_Feeder(object):
         os.chdir(path)
         variables = ['P','Q','QRad','QCon','mDHW','sh_day','sh_bath','sh_night']
 
+
         # Filter out buildings that have a constant comfort temperature
         if filter:
             bui = self.filter()
         else:
             bui = range(self.nBui)
 
+        if average:
+            av = self.create_average_building(bui, variables)
+        else:
+            av = None
+
         for var in variables:
-            self.output(bui, var, sample_time, filter=filter)
+            self.output(bui, var, sample_time, filter=filter, average=av)
         # and conclude
         print '\n'
         print ' - Feeder %s outputted %s buildings.' % (str(self.name), len(bui))
+        if average:
+            '   Along with average building'
 
     def simulate(self, path):
         '''
@@ -62,7 +71,7 @@ class IDEAS_Feeder(object):
             hou.pickle()
             os.chdir(cwd)
 
-    def output(self, buildings, variable, sample_time, filter=False):
+    def output(self, buildings, variable, sample_time, filter=False, average=None):
         '''
         Output the variable for the dwellings in the feeder as a *.txt readable
         for Modelica.
@@ -80,6 +89,9 @@ class IDEAS_Feeder(object):
                 dat = np.vstack((dat,var))
             else:
                 dat = var
+
+        if average[variable] is not None:
+            dat = np.vstack((dat, average[variable]))
 
         #######################################################################
         # and output the array to txt
@@ -119,3 +131,22 @@ class IDEAS_Feeder(object):
                 bui.append(i)
 
         return bui
+
+    def create_average_building(self, buildings, variables):
+        new_dat = {}
+        for variable in variables:
+            print variable
+            dat = np.zeros(0)
+            for i in buildings:
+                hou = cPickle.load(open(str(self.name) + '_' + str(i) + '.p', 'rb'))
+                var = eval('hou.' + variable)
+                if len(dat) != 0:
+                    dat = np.vstack((dat, var))
+                else:
+                    dat = var
+            if 'sh' in variable:
+                new_dat[variable] = np.mean(dat[:, :], axis=0)
+            else:
+                new_dat[variable] = len(buildings)*np.mean(dat[:, :], axis=0)
+
+        return new_dat
