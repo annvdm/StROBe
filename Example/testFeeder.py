@@ -19,4 +19,4 @@ print 'Results saved in: '+resultpath
 if not os.path.isdir(resultpath):
     os.mkdir(resultpath)
 
-test = Corpus.feeder.IDEAS_Feeder('test', 1, resultpath, 3600)
+test = Corpus.feeder.IDEAS_Feeder('test', 2, resultpath, 3600, filter=False)
