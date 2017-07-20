@@ -67,15 +67,15 @@ if __name__ == '__main__':
 
     numbers = OrderedDict()
 
-    for type in ['D', 'SD', 'T']:
+    for type in ['D', 'SD']:  #'T'
         for name in names:
             nametype, number = getNumbers(neighbdata, name, type)
             numbers[nametype] = number
-            print("{: >20} {: >20}".format(nametype, n))
+            print("{: >20} {: >20}".format(nametype, number))
 
     nametypes = numbers.keys()
     finalnumbers = [numbers[i] for i in nametypes]
 
     print 'Results saved in {}'.format(os.path.abspath('Example/GenkNET'))
 
-    Corpus.feeder.IDEAS_feeder(nametypes, finalnumbers, os.path.abspath('Example/GenkNET'), 900, filter=True)
+    Corpus.feeder.IDEAS_cluster(nametypes, finalnumbers, os.path.abspath('Example/GenkNET'), 900, filter=True)
