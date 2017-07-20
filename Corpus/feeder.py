@@ -147,17 +147,17 @@ class IDEAS_Feeder(object):
         for i in buildings:
             hou = cPickle.load(open(str(self.name) + '_' + str(i) + '.p', 'rb'))
             var = eval('hou.' + variable)
+            if len(var) == 52561:
+                var = np.repeat(var, 10)
             if len(dat) != 0:
                 dat = np.vstack((dat, var))
             else:
                 dat = var
         #######################################################################
         # and output the array to txt
-        assert var is not None, 'No buildings came out of the filter, please try again'
         tim = np.linspace(0, 31536000, len(var))
         dat = np.vstack((tim, dat))
-
-        ratio = int(sample_time/(tim[1]-tim[0]))
+        ratio = int(sample_time/60)
         new_len = int(len(var)/ratio)
         new_dat = np.zeros((dat.shape[0], new_len))
         for k in range(int(len(var)/ratio)):
