@@ -14,6 +14,15 @@ import os
 class IDEAS_cluster:
 
     def __init__(self, bui_names, bui_numbers, path, sample_time, filter=False):
+        """
+        Simulate clusters of buildings
+
+        :param bui_names: list of names of buildings or clusters to be simulated
+        :param bui_numbers: number of buildings to be simulated per cluster
+        :param path: path in which to store output files
+        :param sample_time: sample time between data points
+        :param filter: If True, profiles with a constant comfort temperature are removed from the output
+        """
         self.feeders = {}
         self.bui_numbers = bui_numbers
         self.buiNames = bui_names
@@ -23,7 +32,7 @@ class IDEAS_cluster:
         for i, name in enumerate(bui_names):
             nbui = bui_numbers[i]
             print '\n---- Cluster %s ----' % name
-            self.feeders[name] = IDEAS_Feeder(name, nbui, path, sample_time, filter, True, True)
+            self.feeders[name] = IDEAS_Feeder(name=name, nBui=nbui, path=path, sample_time=sample_time, filter=filter, average=True, extra_name=True)
             os.chdir(cdir)
 
         os.chdir(path)
@@ -68,15 +77,14 @@ class IDEAS_Feeder(object):
         """
         Create the community based on number of households and simulate for
         output towards IDEAS model.
+        
         :param name: Name of the feeder
         :param nBui: Number of strobe profiles to be generated
         :param path: Path to folder where results are stored
         :param sample_time: Sample time of the profiles, in seconds
-        :param filter: If True, profiles with a constant comfort temperature ae removed fro; the output
-        :param average: If True, an average for the group of buildings is calculated and included
-        as the last building in the output file
-        :param extra_name: If True, the name of the set of
-        households is included in the name of output txt files
+        :param filter: If True, profiles with a constant comfort temperature are removed from the output
+        :param average: If True, an average for the group of buildings is calculated and included as the last building in the output file
+        :param extra_name: If True, the name of the set of households is included in the name of output txt files
         """
         self.name = name
         self.nBui = nBui

@@ -1,0 +1,10 @@
+Nr Neighborhood Year Number_of_buildings NumberT NumberSD NumberD
+1 TermienWest 1970-1990 623 10 162 451
+2 TermienEast 1946-1970 746 322 386 38
+3 Boxbergheide 1970-1990 2363 25 970 1368
+4 Winterslag 0-1945 1789 551 1034 204
+5 OudWinterslag 1990-2005 444 12 95 337
+6 ZwartbergSouth 1990-2005 1571 475 526 570
+7 ZwartbergNWest 1970-1990 587 78 126 383
+8 ZwartbergNEast 0-1945 584 275 292 17
+9 WaterscheiGarden 0-1945 2064 633 1176 255
