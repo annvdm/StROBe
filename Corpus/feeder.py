@@ -36,6 +36,7 @@ class IDEAS_cluster:
             os.chdir(cdir)
 
         os.chdir(path)
+        print '---- Combining clusters now ----'
         self.output(sample_time, self.order_data())
 
     def order_data(self):
@@ -51,21 +52,28 @@ class IDEAS_cluster:
         return dat
 
     def output(self, sample_time, dat_dict):
-        for key, dat in dat_dict.items():
-            tim = np.linspace(0, 31536000, dat.shape[1])
-            dat = np.vstack((tim, dat))
+        with open('log.txt', mode='w+') as logfile:
+            for key, dat in dat_dict.items():
+                tim = np.linspace(0, 31536000, dat.shape[1])
+                dat = np.vstack((tim, dat))
 
-            ratio = int(sample_time / (tim[1] - tim[0]))
-            new_len = int(len(tim) / ratio)
-            new_dat = np.zeros((dat.shape[0], new_len))
-            for k in range(int(len(tim) / ratio)):
-                new_dat[:, k] = np.mean(dat[:, ratio * k:ratio * (k + 1) - 1], axis=1)
-                new_dat[0, k] = k * sample_time
+                ratio = int(sample_time / (tim[1] - tim[0]))
+                print '{} - Ratio: {}'.format(key, ratio)
+                new_len = int(len(tim) / ratio)
+                new_dat = np.zeros((dat.shape[0], new_len))
 
-            # Data to txt
-            hea = '#1 \ndouble data(' + str(int(new_len)) + ',' + str(len(self.bui_numbers) + 1) + ')'
+                if "sh" in key:
+                    print 'tim:     {}'.format(tim)
+                    print 'new_len: {}'.format(new_len)
+                for k in range(int(len(tim) / ratio)):
+                    logfile.write('{} \n'.format(str(dat[:, ratio * k:ratio * (k + 1) - 1])))
+                    new_dat[:, k] = np.mean(dat[:, ratio * k:ratio * (k + 1) - 1], axis=1)
+                    new_dat[0, k] = k * sample_time
 
-            np.savetxt(fname=key + '.txt', X=new_dat.T, header=hea, comments='')
+                # Data to txt
+                hea = '#1 \ndouble data(' + str(int(new_len)) + ',' + str(len(self.bui_numbers) + 1) + ')'
+
+                np.savetxt(fname=key + '.txt', X=new_dat.T, header=hea, comments='')
 
 
 class IDEAS_Feeder(object):
@@ -188,6 +196,8 @@ class IDEAS_Feeder(object):
                     dat = var
             if not len(buildings) == 1:
                 new_dat[variable] = np.mean(dat, axis=0)
+                print 'Variable: {}'.format(variable)
+                print new_dat[variable]
             else:
                 new_dat[variable] = dat
 
