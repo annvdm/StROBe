@@ -108,7 +108,8 @@ class IDEAS_Feeder(object):
         print '\n'
         print ' - Feeder %s outputted %s buildings.' % (str(self.name), len(bui))
         if average:
-            '   Along with average building'
+            print '   Along with average building'
+        self.cleanup()
 
     def simulate(self, path, filter):
         '''
@@ -191,3 +192,14 @@ class IDEAS_Feeder(object):
                 new_dat[variable] = dat
 
         return new_dat
+
+    def cleanup(self):
+        """
+        Clean all pickle files of this feeder from working directory
+
+        :return:
+        """
+        filelist = [ f for f in os.listdir(".") if (f.endswith(".p") and f.startswith(str(self.name)))]
+        for f in filelist:
+            os.remove(f)
+        print '   .p files removed.'
