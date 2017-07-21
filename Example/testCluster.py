@@ -25,4 +25,4 @@ print 'Results saved in: '+resultpath
 if not os.path.isdir(resultpath):
     os.mkdir(resultpath)
 
-test = Corpus.feeder.IDEAS_cluster(['haarHakker', 'peterslei'], [2, 1], resultpath, 900, filter=False)
+test = Corpus.feeder.IDEAS_cluster(['haarHakker', 'peterslei'], [2, 1], resultpath, sample_time=900, filter=False)
