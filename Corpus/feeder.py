@@ -39,44 +39,36 @@ class IDEAS_cluster:
 
         os.chdir(path)
         print '---- Combining clusters now ----'
-        self.output(sample_time, self.order_data())
+        self.output()
 
     def order_data(self):
         dat = {}
 
-        for name, feeder in self.feeders.items():
+        for name in self.buiNames:
+            feeder= self.feeders[name]
+            print 'Name: {}'.format(name)
             for key in feeder.av:
                 if key not in dat:
                     dat[key] = feeder.av[key]
                 else:
                     dat[key] = np.vstack((dat[key], feeder.av[key]))
 
-        for key in dat:
-            print '{}: {}'.format(key, dat[key].shape)
         return dat
 
-    def output(self, sample_time, dat_dict):
-        for key, dat in dat_dict.items():
-            tim = np.linspace(0, 31536000, dat.shape[1])
+    def output(self):
+        dat_dict = self.order_data()
+
+
+        for key in dat_dict:
+            tim = np.linspace(0, 31536000, dat_dict[key].shape[1])
+            dat = dat_dict[key]
+            print '*** Data shape: {}'.format(dat_dict[key].shape[1])
             dat = np.vstack((tim, dat))
 
-            ratio = int(sample_time / (tim[1] - tim[0]))
-            print '{} - Ratio: {}'.format(key, ratio)
-            new_len = int(len(tim) / ratio)
-            new_dat = np.zeros((dat.shape[0], new_len))
-
-            if "sh" in key:
-                print 'tim:     {}'.format(tim)
-                print 'new_len: {}'.format(new_len)
-            for k in range(int(len(tim) / ratio)):
-                logfile.write('{} \n'.format(str(dat[:, ratio * k:ratio * (k + 1) - 1])))
-                new_dat[:, k] = np.mean(dat[:, ratio * k:ratio * (k + 1) - 1], axis=1)
-                new_dat[0, k] = k * sample_time
-
             # Data to txt
-            hea = '#1 \ndouble data(' + str(int(new_len)) + ',' + str(len(self.bui_numbers) + 1) + ')'
+            hea = '#1\n//{} \ndouble data('.format(self.buiNames) + str(len(tim)) + ',' + str(len(self.bui_numbers) + 1) + ')'
 
-            np.savetxt(fname=key + '.txt', X=new_dat.T, header=hea, comments='')
+            np.savetxt(fname=key + '.txt', X=dat.T, header=hea, comments='')
 
 
 class IDEAS_Feeder(object):
@@ -115,11 +107,14 @@ class IDEAS_Feeder(object):
 
         if average:
             self.av = self.create_average_building(variables)
+            print '*** Average of {}'.format(self.name)
+            print self.av
         else:
             av = None
 
-        for var in variables:
-            self.output(var, sample_time, extra_name=extra_name)
+        if not test:
+            for var in variables:
+                self.output(var, sample_time, extra_name=extra_name)
         # and conclude
         print '\n'
         print ' - Feeder %s outputted %s buildings.' % (str(self.name), nBui)
@@ -202,19 +197,13 @@ class IDEAS_Feeder(object):
     def create_average_building(self, variables):
         new_dat = {}
         for variable in variables:
-            dat = np.zeros(0)
-            for i in self.bui:
-                hou = cPickle.load(open(str(self.name) + '_' + str(i) + '.p', 'rb'))
-                var = eval('hou.' + variable)
-                if len(dat) != 0:
-                    dat = np.vstack((dat, var))
-                else:
-                    dat = var
+            dat = np.loadtxt(fname='{}_{}.txt'.format(variable, self.name),skiprows=2, unpack=True)
             if not self.nBui == 1:
-                new_dat[variable] = np.mean(dat, axis=0)
+                new_dat[variable] = np.mean(dat[1:], axis=0)
+                print 'Creating average for variable {}.'.format(variable)
+                print new_dat[variable]
             else:
-                new_dat[variable] = dat
-
+                new_dat[variable] = dat[1]
         return new_dat
 
     def cleanup(self):
