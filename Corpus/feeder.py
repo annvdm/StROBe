@@ -116,8 +116,6 @@ class IDEAS_Feeder(object):
 
         if average:
             self.av = self.create_average_building(variables)
-            print '*** Average of {}'.format(self.name)
-            print self.av
         else:
             av = None
 
@@ -205,8 +203,6 @@ class IDEAS_Feeder(object):
             dat = np.loadtxt(fname='{}_{}.txt'.format(variable, self.name),skiprows=2, unpack=True)
             if not self.nBui == 1:
                 new_dat[variable] = np.mean(dat[1:], axis=0)
-                print 'Creating average for variable {}.'.format(variable)
-                print new_dat[variable]
             else:
                 new_dat[variable] = dat[1]
         return new_dat
