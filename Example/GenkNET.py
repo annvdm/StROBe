@@ -76,8 +76,7 @@ def makeStrobe(data):
     print path
     if not os.path.isdir(path):
         os.mkdir(path)
-    #TODO Change here
-    Corpus.feeder.IDEAS_cluster(bui_names=['D', 'SD'], bui_numbers=[2, 2], sample_time=900, path=path, filter=True, test=False, extra_name=name)
+    Corpus.feeder.IDEAS_cluster(bui_names=types, bui_numbers=numbers, sample_time=900, path=path, filter=True, test=False, extra_name=name)
 
 def collecttxt(target):
     """
@@ -86,13 +85,19 @@ def collecttxt(target):
     :param target: Target path where to copy txt files to
     :return:
     """
-    filedir = os.path.abspath('Example/GenkNET')
+    filedir = os.path.abspath('..')
+    #print filedir
 
     names = [ name for name in os.listdir(filedir) if os.path.isdir(os.path.join(filedir, name)) ]
     for name in names:
         foldir = os.path.join(filedir, name)
+        #print foldir
         tocopy = [file for file in os.listdir(foldir) if (os.path.isfile(os.path.join(foldir, file)) and name in file) ]
-        shutil.copy(os.path.join(foldir, file), dst=target)
+
+    #print tocopy
+    for filename in tocopy:
+        #print filename
+        shutil.copy(os.path.join(foldir, filename), dst=target)
 
 
 if __name__ == '__main__':
@@ -101,7 +106,8 @@ if __name__ == '__main__':
     # print neighbdata
 
     # Choose multiprocessing or serial computing
-    multi = True
+    # Serial mostly useful for debugging as multiprocessing messes up Traceback
+    multi = False
 
     filepath = os.path.abspath(__file__)
     os.chdir(os.path.dirname(filepath))
