@@ -5,6 +5,9 @@ Description
 from collections import OrderedDict
 import os
 import pandas as pd
+import shutil
+
+from multiprocessing import Pool
 
 import Corpus.feeder
 
@@ -34,48 +37,99 @@ def getNeighbNames(data):
     return data.index.values
 
 
-def getNumbers(data, neighbname, type, maxNr=50):
+def getNumbers(data, neighbname, buiType, maxNr=50):
     """
     Get numbers of neighborhoods
 
     :param data: Neighborhood data
     :param neighbname: Name of neighborhood
-    :param type: 'D', 'SD' or 'T'
+    :param buiType: 'D', 'SD' or 'T'
     :param max:  Maximal cluster size, default 50
     :return tuple: Name of neighborhood with type indication, number of buildings
     """
 
-    assert type in ['D', 'SD', 'T'], 'Type must be D, SD or T'
+    assert buiType in ['D', 'SD', 'T'], 'Type must be D, SD or T'
 
-    outName = "{}_{}".format(neighbname, type)
-    number = data['Number{}'.format(type)][neighbname]
+    outName = "{}_{}".format(neighbname, buiType)
+
+    print data
+    print 'buiType {}'.format(buiType)
+    print 'neighbname {}'.format(buiType)
+    print 'Number'+ str(buiType)
+    number = data['Number'+ str(buiType)][neighbname]
     outNumber = min(number, maxNr)
 
     return outName, outNumber
+
+def makeStrobe(data):
+    """
+    Perform StROBe simulation for one neighborhood
+
+    :return:
+    """
+
+    name = data['name']
+    types = ['D', 'SD', 'T']
+    numbers = [data[type] for type in types]
+
+    path = os.path.abspath('Example/GenkNET/{}'.format(name))
+    print path
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    #TODO Change here
+    Corpus.feeder.IDEAS_cluster(bui_names=['D', 'SD'], bui_numbers=[2, 2], sample_time=900, path=path, filter=True, test=False, extra_name=name)
+
+def collecttxt(target):
+    """
+    Collect and save output files at an indicated location
+
+    :param target: Target path where to copy txt files to
+    :return:
+    """
+    filedir = os.path.abspath('Example/GenkNET')
+
+    names = [ name for name in os.listdir(filedir) if os.path.isdir(os.path.join(filedir, name)) ]
+    for name in names:
+        foldir = os.path.join(filedir, name)
+        tocopy = [file for file in os.listdir(foldir) if (os.path.isfile(os.path.join(foldir, file)) and name in file) ]
+        shutil.copy(os.path.join(foldir, file), dst=target)
 
 
 if __name__ == '__main__':
     neighbdata = readData()
     names = getNeighbNames(neighbdata)
-
     # print neighbdata
+
+    # Choose multiprocessing or serial computing
+    multi = True
 
     filepath = os.path.abspath(__file__)
     os.chdir(os.path.dirname(filepath))
     os.chdir('..')
     print os.getcwd()
 
-    numbers = OrderedDict()
+    inputs = []
 
-    for type in ['D', 'SD']:  #'T'
-        for name in names:
-            nametype, number = getNumbers(neighbdata, name, type)
-            numbers[nametype] = number
-            print("{: >20} {: >20}".format(nametype, number))
+    for name in names:
+        data = OrderedDict()
+        for type in ['D', 'SD', 'T']:
+            nametype, number = getNumbers(data=neighbdata, neighbname=name, buiType=type)
+            data[type] = number
+        data['name'] = name
+        inputs.append(data)
+        print("{: >20} {: >20} {: >20}".format(name, nametype, number))
+    if multi:
+        po = Pool(processes=4)
+        po.map(makeStrobe, inputs)
+    else:
+        for inp in inputs[:1]:
+            makeStrobe(inp)
 
-    nametypes = numbers.keys()
-    finalnumbers = [numbers[i] for i in nametypes]
+    target = 'C:/Users/u0094934/Documents/Dymola/GenkNET/UserData'
+    if not os.path.isdir(target):
+        os.mkdir(target)
+    collecttxt(target)
 
-    print 'Results saved in {}'.format(os.path.abspath('Example/GenkNET'))
 
-    Corpus.feeder.IDEAS_cluster(nametypes, finalnumbers, os.path.abspath('Example/GenkNET'), 900, filter=True)
+
+

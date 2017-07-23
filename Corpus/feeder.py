@@ -15,15 +15,17 @@ import os
 
 class IDEAS_cluster:
 
-    def __init__(self, bui_names, bui_numbers, path, sample_time, filter=False):
+    def __init__(self, bui_names, bui_numbers, path, sample_time, filter=False, test=False, extra_name=None):
         """
         Simulate clusters of buildings
 
         :param bui_names: list of names of buildings or clusters to be simulated
         :param bui_numbers: number of buildings to be simulated per cluster
         :param path: path in which to store output files
-        :param sample_time: sample time between data points
-        :param filter: If True, profiles with a constant comfort temperature are removed from the output
+        :param int sample_time: sample time between data points. Should be an integer multiple of 60 sec.
+        :param bool filter: If True, profiles with a constant comfort temperature are removed from the output
+        :param bool test: if True, suppress simulations to reduce runtime. Default False.
+        :param str extra_name: provide name with which to save summary files. Default None
         """
         self.feeders = {}
         self.bui_numbers = bui_numbers
@@ -34,12 +36,12 @@ class IDEAS_cluster:
         for i, name in enumerate(bui_names):
             nbui = bui_numbers[i]
             print '\n---- Cluster %s ----' % name
-            self.feeders[name] = IDEAS_Feeder(name=name, nBui=nbui, path=path, sample_time=sample_time, filter=filter, average=True, extra_name=True, cleanup=False)
+            self.feeders[name] = IDEAS_Feeder(name=name, nBui=nbui, path=path, sample_time=sample_time, filter=filter, average=True, extra_name=True, cleanup=True, test=test)
             os.chdir(cdir)
 
         os.chdir(path)
         print '---- Combining clusters now ----'
-        self.output()
+        self.output(extra_name)
 
     def order_data(self):
         dat = {}
@@ -55,20 +57,24 @@ class IDEAS_cluster:
 
         return dat
 
-    def output(self):
+    def output(self, extra_name):
         dat_dict = self.order_data()
 
 
         for key in dat_dict:
             tim = np.linspace(0, 31536000, dat_dict[key].shape[1])
             dat = dat_dict[key]
-            print '*** Data shape: {}'.format(dat_dict[key].shape[1])
+            #print '*** Data shape: {}'.format(dat_dict[key].shape[1])
             dat = np.vstack((tim, dat))
 
             # Data to txt
             hea = '#1\n//{} \ndouble data('.format(self.buiNames) + str(len(tim)) + ',' + str(len(self.bui_numbers) + 1) + ')'
+            if extra_name is not None:
+                filename = '{}_{}.txt'.format(extra_name, key)
+            else:
+                filename = '{}.txt'.format(key)
 
-            np.savetxt(fname=key + '.txt', X=dat.T, header=hea, comments='')
+            np.savetxt(fname=filename, X=dat.T, header=hea, comments='')
 
 
 class IDEAS_Feeder(object):
@@ -103,7 +109,10 @@ class IDEAS_Feeder(object):
         os.chdir(path)
         variables = ['P', 'Q', 'QRad', 'QCon', 'mDHW', 'sh_day', 'sh_bath', 'sh_night']
 
-
+        if not test:
+            for var in variables:
+                self.output(var, sample_time, extra_name=extra_name)
+        # and conclude
 
         if average:
             self.av = self.create_average_building(variables)
@@ -112,10 +121,6 @@ class IDEAS_Feeder(object):
         else:
             av = None
 
-        if not test:
-            for var in variables:
-                self.output(var, sample_time, extra_name=extra_name)
-        # and conclude
         print '\n'
         print ' - Feeder %s outputted %s buildings.' % (str(self.name), nBui)
         if average:
