@@ -2,6 +2,9 @@
 """
 Description
 """
+import numpy as np
+from Corpus import stats
+
 # From residential.py
 
 types = dict()
@@ -25,12 +28,23 @@ given.update({'7': ['dayzone', 'bathroom']})
 
 #######################################################################
 # select a type from the given tipes and probabilities
-rnd = np.random.random()
-print rnd
-shtype = str(1 + stats.get_probability(rnd, types['prob'], 'prob'))
-print shtype
-if len(np.shape(given[shtype])) != 1:
-    nr = np.random.randint(np.shape(given[shtype])[0])
-    shrooms = given[shtype][nr]
-else:
-    shrooms = given[shtype]
+test = []
+rooms = []
+for i in range(100000):
+    rnd = np.random.random()
+    shtype = str(1 + stats.get_probability(rnd, types['prob'], 'prob'))
+    test.append(int(shtype))
+    if len(np.shape(given[shtype])) != 1:
+        nr = np.random.randint(np.shape(given[shtype])[0])
+        shrooms = given[shtype][nr]
+        rooms.append(shrooms)
+    else:
+        shrooms = given[shtype]
+        rooms.append(shrooms)
+
+#print test
+#print rooms
+
+import matplotlib.pyplot as plt
+plt.hist(test, bins=5, normed=True)
+plt.show()

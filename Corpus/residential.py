@@ -511,22 +511,27 @@ class Household(object):
         types.update({'prob' : [0.16, 0.35, 0.08, 0.11, 0.05, 0.20]})
         # and given a type, denote which rooms are heated
         given = dict()
-        given.update({'2' : ['dayzone','bathroom']})
+        given.update({'2' : [['dayzone','bathroom']]})
         given.update({'3' : [['dayzone'],['dayzone','bathroom'],['dayzone','nightzone']]})
         given.update({'4' : [['dayzone'],['dayzone','nightzone']]})
-        given.update({'5' : ['dayzone']})
-        given.update({'6' : ['dayzone','bathroom','nightzone']})
-        given.update({'7' : ['dayzone','bathroom']})
+        given.update({'5' : [['dayzone']]})
+        given.update({'6' : [['dayzone','bathroom','nightzone']]})
+        given.update({'7' : [['dayzone','bathroom']]})
         
         #######################################################################
         # select a type from the given tipes and probabilities
         rnd = np.random.random()
         shtype = str(1 + stats.get_probability(rnd, types['prob'], 'prob'))
-        if len(np.shape(given[shtype])) != 1:
+        print '*** np.shape: {}'.format(np.shape(given[shtype]))
+        print given[shtype]
+        if np.shape(given[shtype])[0] != 1:
             nr = np.random.randint(np.shape(given[shtype])[0])
+            print 'multiple room settings recognized, chosen nr: {}'.format(nr)
             shrooms = given[shtype][nr]
         else:
-            shrooms = given[shtype]
+            shrooms = given[shtype][0]
+
+        print 'shrooms: {}'.format(shrooms)
 
         #######################################################################
         # create a profile for he heated rooms
@@ -536,6 +541,8 @@ class Household(object):
             for i in range(len(shset)):
                 if int(shset[i]) == key:
                     shset[i] = types[shtype][key]
+        print 'shset'
+        print shset
 
         #######################################################################
         # and couple to the heated rooms            
@@ -549,7 +556,7 @@ class Household(object):
         self.sh_settings = sh_settings
         print ' - Average comfort setting is %s Celsius' % str(round(np.average(sh_settings['dayzone']),2))
         return None
-
+        #TODO check shrooms
     def roundUp(self):
         '''
         Round the simulation by wrapping all data and reduce storage size.
