@@ -522,11 +522,11 @@ class Household(object):
         # select a type from the given tipes and probabilities
         rnd = np.random.random()
         shtype = str(1 + stats.get_probability(rnd, types['prob'], 'prob'))
-        print '*** np.shape: {}'.format(np.shape(given[shtype]))
-        print given[shtype]
+        #print '*** np.shape: {}'.format(np.shape(given[shtype]))
+        #print given[shtype]
         if np.shape(given[shtype])[0] != 1:
             nr = np.random.randint(np.shape(given[shtype])[0])
-            print 'multiple room settings recognized, chosen nr: {}'.format(nr)
+            #print 'multiple room settings recognized, chosen nr: {}'.format(nr)
             shrooms = given[shtype][nr]
         else:
             shrooms = given[shtype][0]

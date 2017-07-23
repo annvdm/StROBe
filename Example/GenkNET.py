@@ -107,7 +107,7 @@ if __name__ == '__main__':
 
     # Choose multiprocessing or serial computing
     # Serial mostly useful for debugging as multiprocessing messes up Traceback
-    multi = False
+    multi = True
 
     filepath = os.path.abspath(__file__)
     os.chdir(os.path.dirname(filepath))
