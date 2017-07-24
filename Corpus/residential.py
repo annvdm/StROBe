@@ -536,7 +536,7 @@ class Household(object):
         else:
             shrooms = given[shtype][0]
 
-        print 'shrooms: {}'.format(shrooms)
+        #print 'shrooms: {}'.format(shrooms)
 
         #######################################################################
         # create a profile for he heated rooms
@@ -546,8 +546,8 @@ class Household(object):
             for i in range(len(shset)):
                 if int(shset[i]) == key:
                     shset[i] = types[shtype][key]
-        print 'shset'
-        print shset
+        #print 'shset'
+        #print shset
 
         #######################################################################
         # and couple to the heated rooms            
