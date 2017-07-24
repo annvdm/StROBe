@@ -52,7 +52,7 @@ def getNumbers(data, neighbname, buiType, maxNr=50):
 
     outName = "{}_{}".format(neighbname, buiType)
 
-    print data
+    # print data
     print 'buiType {}'.format(buiType)
     print 'neighbname {}'.format(buiType)
     print 'Number' + str(buiType)
@@ -127,6 +127,11 @@ if __name__ == '__main__':
     homefolder = 'C:/Users/u0094934/Software/StROBe'
     # CHANGE TO YOUR OWN StROBe DIRECTORY!
 
+    source = 'C:/Users/u0094934/Software/StROBe/Example/GenkNET'
+    # Where results of this file are saved (keep the Example/GenkNET structure, but change the rest accordingly)
+    target = 'C:/Users/u0094934/Documents/Dymola/GenkNET/UserData'
+    # Where the results should go (direct to subdirectory UserData of your GenkNET clone)
+
     ############################
     ##     CODE FROM HERE     ##
     ############################
@@ -165,8 +170,7 @@ if __name__ == '__main__':
         for inp in inputs:
             makeStrobe(inp)
 
-    source = 'C:/Users/u0094934/Software/StROBe/Example/GenkNET'
-    target = 'C:/Users/u0094934/Documents/Dymola/GenkNET/UserData'
+
     if not os.path.isdir(target):
         os.mkdir(target)
     collecttxt(target, source)
