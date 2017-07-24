@@ -5,3 +5,5 @@ Corpus/.ipynb_checkpoints/
 *.p
 Data/test/testFeederOut/
 Example/testFeederOut/
+Example/testClusterOut/
+Example/GenkNET/
