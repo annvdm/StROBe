@@ -82,7 +82,7 @@ class IDEAS_Feeder(object):
     The Community class defines a set of households.
     """
     
-    def __init__(self, name, nBui, path, sample_time, filter=False, average=False, extra_name=False, cleanup=False, test=True):
+    def __init__(self, name, nBui, path, sample_time, filter=False, average=False, extra_name=False, cleanup=False, test=False):
         """
         Create the community based on number of households and simulate for
         output towards IDEAS model.
@@ -177,15 +177,19 @@ class IDEAS_Feeder(object):
         # and output the array to txt
         tim = np.linspace(0, 31536000, len(var))
         dat = np.vstack((tim, dat))
+        print dat[:, :10]
         #print '*** Complete data **************************'
         #print dat
         ratio = int(sample_time/60)
-        new_len = int(len(var)/ratio)+1
+        new_len = int(len(var)/ratio)
         new_dat = np.zeros((dat.shape[0], new_len))
 
-        for k in range(new_len):
-            new_dat[:, k] = np.mean(dat[:, ratio*k:ratio*(k+1)-1], axis=1)
-            new_dat[0, k] = k*sample_time
+        if ratio == 1:
+            new_dat=dat
+        else:
+            for k in range(new_len):
+                new_dat[:, k] = np.mean(dat[:, ratio*k:ratio*(k+1)-1], axis=1)
+                new_dat[0, k] = k*sample_time
 
         # Data to txt
         hea ='#1 \ndouble data('+str(int(new_len))+','+str(self.nBui+1)+')'
