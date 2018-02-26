@@ -47,7 +47,7 @@ class IDEAS_cluster:
         dat = {}
 
         for name in self.buiNames:
-            feeder= self.feeders[name]
+            feeder = self.feeders[name]
             print 'Name: {}'.format(name)
             for key in feeder.av:
                 if key not in dat:
@@ -60,9 +60,13 @@ class IDEAS_cluster:
     def output(self, extra_name):
         dat_dict = self.order_data()
 
-
         for key in dat_dict:
-            tim = np.linspace(0, 31536000, dat_dict[key].shape[1])
+            print dat_dict[key].shape
+            if len(dat_dict[key].shape) == 1:
+                length = dat_dict[key].shape[0]
+            else:
+                length = dat_dict[key].shape[1]
+            tim = np.linspace(0, 31536000, length)
             dat = dat_dict[key]
             #print '*** Data shape: {}'.format(dat_dict[key].shape[1])
             dat = np.vstack((tim, dat))

@@ -1,0 +1,2 @@
+Nr Neighborhood Number_of_buildings NumberTot
+1 standard 10 10

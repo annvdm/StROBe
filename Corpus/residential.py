@@ -579,7 +579,7 @@ class Household(object):
             :param dat: Data to be converted (sample time of 1 minute is assumed)
             :return: Converted data
             """
-            npoints = 4 * 60  # Number of minutes in 4 hours
+            npoints = 0 * 60  # Number of minutes in 4 hours
             dat = np.roll(dat, npoints)
             return dat
 

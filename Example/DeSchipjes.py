@@ -11,7 +11,15 @@ import pandas as pd
 
 import Corpus.feeder
 
+"""
+Change this:
+"""
+case = 'DeSchipjes'
 
+
+"""
+Don't change this
+"""
 # Corpus.feeder.IDEAS_cluster()
 
 def readData():
@@ -20,7 +28,7 @@ def readData():
 
     :return pd.DataFrame: Neighborhood data DataFrame
     """
-    data = pd.read_csv('GenkNET/GenkNeighborhoods.txt', sep=' ')
+    data = pd.read_csv(case + '/' + case + '.txt', sep=' ')
     data = data.set_index('Neighborhood')
     return data
 
@@ -48,16 +56,16 @@ def getNumbers(data, neighbname, buiType, maxNr=50):
     :return tuple: Name of neighborhood with type indication, number of buildings
     """
 
-    assert buiType in ['D', 'SD', 'T'], 'Type must be D, SD or T'
+    assert buiType in ['Tot'], 'Type must be Tot'
 
     outName = "{}_{}".format(neighbname, buiType)
 
-    # print data
+    print data
     print 'buiType {}'.format(buiType)
-    print 'neighbname {}'.format(buiType)
-    print 'Number' + str(buiType)
+    print 'neighbname {}'.format(neighbname)
     number = data['Number' + str(buiType)][neighbname]
     outNumber = min(number, maxNr)
+    print 'Number' + str(outNumber)
 
     return outName, outNumber
 
@@ -74,10 +82,10 @@ def makeStrobe(data):
     os.chdir(homefolder)
 
     name = data['name']
-    types = ['D', 'SD', 'T']
+    types = ['Tot']
     numbers = [data[type] for type in types]
 
-    path = os.path.abspath('Example/GenkNET/{}'.format(name))
+    path = os.path.abspath('Example/' + case + '/{}'.format(name))
 
     print '*** Path to save all files: {}'.format(path)
     if not os.path.isdir(path):
@@ -127,11 +135,6 @@ if __name__ == '__main__':
     homefolder = 'C:\Users\u0111619\Documents\Python\StROBe'
     # CHANGE TO YOUR OWN StROBe DIRECTORY!
 
-    source = 'C:/Users/u0094934/Software/StROBe/Example/GenkNET'
-    # Where results of this file are saved (keep the Example/GenkNET structure, but change the rest accordingly)
-    target = 'C:/Users/u0094934/Documents/Dymola/GenkNET/UserData'
-    # Where the results should go (direct to subdirectory UserData of your GenkNET clone)
-
     ############################
     ##     CODE FROM HERE     ##
     ############################
@@ -149,7 +152,7 @@ if __name__ == '__main__':
 
     for name in names:
         data = OrderedDict()
-        for type in ['D', 'SD', 'T']:
+        for type in ['Tot']:
             nametype, number = getNumbers(data=neighbdata, neighbname=name, buiType=type)
             data[type] = number
         data['name'] = name
@@ -157,10 +160,6 @@ if __name__ == '__main__':
         inputs.append(data)
         print("{: >20} {: >20} {: >20}".format(name, nametype, number))
 
-    if part == 'Bram':
-        inputs = inputs[:4]
-    else:
-        inputs = inputs[5:]
     print inputs
 
     if multi:
@@ -169,8 +168,9 @@ if __name__ == '__main__':
     else:
         for inp in inputs:
             makeStrobe(inp)
-    source = 'C:\Users\u0111619\Documents\Python\StROBe\Example\GenkNET'
-    target = 'C:\Users\u0111619\Documents\Dymola\GenkNET-git\GenkNET\UserData'
-    if not os.path.isdir(target):
-        os.mkdir(target)
-    collecttxt(target, source)
+
+    source = 'C:\Users\u0111619\Documents\Python\StROBe\Example\Boxbergheide'
+    # target = 'C:\Users\u0111619\Documents\Dymola\GenkNET-git\GenkNET\UserData'
+    # if not os.path.isdir(target):
+    #     os.mkdir(target)
+    # collecttxt(target, source)
