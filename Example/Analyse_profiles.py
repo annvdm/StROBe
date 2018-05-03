@@ -13,7 +13,7 @@ def readData(name):
     """
     filename = 'results/' + name + '.txt'
 
-    data = pd.read_csv(filename, sep=' ', skiprows=[0,1], names=range(10))
+    data = pd.read_csv(os.path.abspath(filename), sep=' ', skiprows=[0,1], names=range(10))
     return data
 
 

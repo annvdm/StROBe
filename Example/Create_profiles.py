@@ -21,16 +21,16 @@ def readData(name):
 
     :return pd.DataFrame: Neighborhood data DataFrame
     """
-    filename = 'results/' + '.txt'
+    filename = 'results/' + name + '.txt'
 
-    data = pd.read_csv(filename, sep=' ')
-    data = data.set_index(name)
+    data = pd.read_csv(os.path.abspath(filename), sep=' ', skiprows=[0,1], names=range(10))
+
     return data
 
 def plot_data(name):
     data = readData(name)
 
-    fig, ax = plt.figure()
+    fig, ax = plt.subplots()
     ax.plot(data)
 
 
@@ -38,10 +38,10 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 destination = os.path.join(dir_path, 'results')
 if not os.path.isdir(destination):
     os.mkdir(destination)
-Corpus.feeder.IDEAS_Feeder('test', 10, destination)
+# Corpus.feeder.IDEAS_Feeder('test', 10, destination)
 
 plot_data('P')
-
+plt.show()
 
 # if __name__ == '__main__':
 #
