@@ -97,12 +97,12 @@ def makeStrobe(data):
     name = data['name']
     types = ['D', 'SD', 'T']
 
-    path = os.path.abspath('GenkNET/{}'.format(name))
+    parentpath = os.path.abspath('GenkNET/{}'.format(name))
 
-    print '*** Path to save all files: {}'.format(path)
-    if not os.path.isdir(path):
-        os.mkdir(path)
     for buildingType in types:
+        path = os.path.join(parentpath, buildingType)
+        if not os.path.isdir(path):
+            os.makedirs(path)
         cf.IDEAS_Feeder(name=buildingType, nBui=data[buildingType], path=path)
 
 
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     ##  PARAMETERS TO CHANGE  ##
     ############################
 
-    multi = False  # Choose True to enable multiprocessing
+    multi = True  # Choose True to enable multiprocessing
     part = 'Bram'  # or 'Annelies'
     proc = 3  # Number of simultaneous calculations
     homefolder = 'C:/Users/u0094934/Software/StROBe'

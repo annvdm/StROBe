@@ -38,7 +38,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 destination = os.path.join(dir_path, 'results')
 if not os.path.isdir(destination):
     os.mkdir(destination)
-# Corpus.feeder.IDEAS_Feeder('test', 10, destination)
+Corpus.feeder.IDEAS_Feeder('test', 10, destination)
 
 plot_data('P')
 plt.show()
