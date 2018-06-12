@@ -92,20 +92,18 @@ def makeStrobe(data):
     """
 
     homefolder = data['home']
-    os.chdir(homefolder)
+    # os.chdir(homefolder)
 
     name = data['name']
     types = ['D', 'SD', 'T']
 
-    path = os.path.abspath('Example/GenkNET/{}'.format(name))
+    path = os.path.abspath('GenkNET/{}'.format(name))
 
     print '*** Path to save all files: {}'.format(path)
     if not os.path.isdir(path):
         os.mkdir(path)
     for buildingType in types:
-        strobe_path = '_'.join([path, name, buildingType])
-        print strobe_path
-        cf.IDEAS_Feeder(name=buildingType, nBui=data[buildingType], path=strobe_path)
+        cf.IDEAS_Feeder(name=buildingType, nBui=data[buildingType], path=path)
 
 
 if __name__ == '__main__':
@@ -135,10 +133,9 @@ if __name__ == '__main__':
     # print neighbdata
 
     filepath = os.path.abspath(__file__)
-    os.chdir(os.path.dirname(filepath))
-    os.chdir('..')
+    #os.chdir(os.path.dirname(filepath))
+    #os.chdir('..')
     print os.getcwd()
-
     inputs = []
 
     for name in names:
