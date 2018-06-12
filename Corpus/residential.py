@@ -23,6 +23,9 @@ sys.path.append("..")
 from Data.Households import households
 from Data.Appliances import set_appliances
 
+
+strobe_dir = os.path.join(os.path.abspath('..'))
+
 class Household(object):
     '''
     The Household class is the main class of ProclivityPy, defining the
@@ -381,7 +384,7 @@ class Household(object):
             # Since the data starts at midnight, a shift to 4am is necessary
             # so that it coincides with the occupancy data!!!
             # the first 4 h are moved to the end. 
-            os.chdir(r'../Data')
+            os.chdir(os.path.join(strobe_dir, 'Data'))
             file = open('Climate/irradiance.txt','r')
             data_pickle = file.read()
             file.close()
