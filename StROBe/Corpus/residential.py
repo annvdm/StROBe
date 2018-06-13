@@ -14,6 +14,7 @@ import random
 import time
 
 import numpy as np
+from pkg_resources import resource_filename
 
 import data
 import stats
@@ -271,7 +272,6 @@ class Household(object):
         # We change the directory to to location where the data is stored,
         # and run the three type of days, ie. wkdy, sat and son succesively
         # by which we can create a typical week.
-        cdir = os.getcwd()
         occ_week = []
         for member in self.clusters:
             startstate = 2  # 4.00 AM
@@ -299,7 +299,6 @@ class Household(object):
         # output ##############################################################
         # chdir back to original and return the occupancy states to the class
         # object.
-        os.chdir(cdir)
         self.occ = occ_year
         self.occ_m = occ_merged
         # and print statements
@@ -381,8 +380,8 @@ class Household(object):
             # Since the data starts at midnight, a shift to 4am is necessary
             # so that it coincides with the occupancy data!!!
             # the first 4 h are moved to the end. 
-            os.chdir(r'../Data')
-            file = open('Climate/irradiance.txt', 'r')
+
+            file = open(resource_filename('StROBe', 'Data/Climate/irradiance.txt'), 'r')
             data_pickle = file.read()
             file.close()
             irr = cPickle.loads(data_pickle)
@@ -589,11 +588,11 @@ class Household(object):
         # and end
         return None
 
-    def pickle(self):
+    def pickle(self, path):
         '''
         Pickle the generated profile and its results for storing later.
         '''
-        cPickle.dump(self, open(self.name + '.p', 'wb'))
+        cPickle.dump(self, open(path+'/'+self.name + '.p', 'wb'))
         return None
 
 

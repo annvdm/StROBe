@@ -20,7 +20,7 @@ def readData(name):
     """
     filename = 'results/' + name + '.txt'
 
-    data = pd.read_csv(os.path.abspath(filename), sep=' ', skiprows=[0,1], names=range(10))
+    data = pd.read_csv(os.path.abspath(filename), sep=' ', skiprows=[0,1], names=range(10), index_col=0)
 
     return data
 
@@ -32,10 +32,13 @@ def plot_data(name):
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
+print dir_path
 destination = os.path.join(dir_path, 'results')
+print destination
+print os.getcwd()
 if not os.path.isdir(destination):
     os.mkdir(destination)
-feeder.IDEAS_Feeder('test', 10, destination)
+#feeder.IDEAS_Feeder('test', 2, destination)
 
 plot_data('P')
 plt.show()
