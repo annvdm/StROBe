@@ -9,7 +9,7 @@ from multiprocessing import Pool
 
 import pandas as pd
 
-import Corpus.feeder as cf
+import StROBe.Corpus.feeder as cf
 
 
 def readData(path):
@@ -89,13 +89,10 @@ def makeStrobe(data):
     :return:
     """
 
-    homefolder = data['home']
-    os.chdir(homefolder)
-
     name = data['name']
     types = ['D', 'SD', 'T']
 
-    parentpath = os.path.abspath('Example/GenkNET/{}'.format(name))
+    parentpath = os.path.abspath('GenkNET/{}'.format(name))
 
     print '*** Path to save all files: {}'.format(parentpath)
     for buildingType in types:
@@ -111,15 +108,13 @@ if __name__ == '__main__':
     ##  PARAMETERS TO CHANGE  ##
     ############################
 
-    multi = False  # Choose True to enable multiprocessing
-    part = 'Bram'  # or 'Annelies'
+    multi = True  # Choose True to enable multiprocessing
+    # part = 'Bram'  # or 'Annelies'
     proc = 3  # Number of simultaneous calculations
-    homefolder = 'C:\Users\u0111619\Documents\Python\StROBe'
-    # CHANGE TO YOUR OWN StROBe DIRECTORY!
 
-    source = 'C:\Users\u0111619\Documents\Python\StROBe\Example\GenkNET'
+    source = os.path.abspath('GenkNET')
     # Where results of this file are saved (keep the Example/GenkNET structure, but change the rest accordingly)
-    target = 'C:\Users\u0111619\Documents\Python\StROBe\Example\GenkNET'
+    target = os.path.abspath('GenkNET')
     # Where the results should go (direct to subdirectory UserData of your GenkNET clone)
 
     ############################
@@ -142,14 +137,13 @@ if __name__ == '__main__':
             nametype, number = getNumbers(data=neighbdata, neighbname=name, buiType=type)
             data[type] = number
         data['name'] = name
-        data['home'] = homefolder
         inputs.append(data)
         print("{: >20} {: >20} {: >20}".format(name, nametype, number))
-
-    if part == 'Bram':
-        inputs = inputs[:4]
-    else:
-        inputs = inputs[5:]
+    #
+    # if part == 'Bram':
+    #     inputs = inputs[:4]
+    # else:
+    #     inputs = inputs[5:]
 
     if multi:
         po = Pool(processes=proc)
