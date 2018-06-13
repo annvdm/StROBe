@@ -49,9 +49,9 @@ def getNumbers(data, neighbname, buiType, maxNr=50):
     # print data
     print 'buiType {}'.format(buiType)
     print 'neighbname {}'.format(buiType)
-    print 'Number' + str(buiType)
     number = data['Number' + str(buiType)][neighbname]
     outNumber = min(number, maxNr)
+    print 'Number ' + str(outNumber)
 
     return outName, outNumber
 
@@ -65,13 +65,11 @@ def collecttxt(target, source=None):
     """
     if source is None:
         filedir = os.path.abspath('..')
-        print filedir
     else:
         filedir = source
         os.chdir(source)
 
     names = [name for name in os.listdir(filedir) if os.path.isdir(os.path.join(filedir, name))]
-    print names
 
     for name in names:
         foldir = os.path.join(filedir, name)
@@ -92,13 +90,14 @@ def makeStrobe(data):
     """
 
     homefolder = data['home']
-    # os.chdir(homefolder)
+    os.chdir(homefolder)
 
     name = data['name']
     types = ['D', 'SD', 'T']
 
-    parentpath = os.path.abspath('GenkNET/{}'.format(name))
+    parentpath = os.path.abspath('Example/GenkNET/{}'.format(name))
 
+    print '*** Path to save all files: {}'.format(parentpath)
     for buildingType in types:
         path = os.path.join(parentpath, buildingType)
         if not os.path.isdir(path):
@@ -112,15 +111,15 @@ if __name__ == '__main__':
     ##  PARAMETERS TO CHANGE  ##
     ############################
 
-    multi = True  # Choose True to enable multiprocessing
+    multi = False  # Choose True to enable multiprocessing
     part = 'Bram'  # or 'Annelies'
     proc = 3  # Number of simultaneous calculations
-    homefolder = 'C:/Users/u0094934/Software/StROBe'
+    homefolder = 'C:\Users\u0111619\Documents\Python\StROBe'
     # CHANGE TO YOUR OWN StROBe DIRECTORY!
 
-    source = 'C:/Users/u0094934/Software/StROBe/Example/GenkNET'
+    source = 'C:\Users\u0111619\Documents\Python\StROBe\Example\GenkNET'
     # Where results of this file are saved (keep the Example/GenkNET structure, but change the rest accordingly)
-    target = 'C:/Users/u0094934/Documents/Dymola/GenkNET/UserData'
+    target = 'C:\Users\u0111619\Documents\Python\StROBe\Example\GenkNET'
     # Where the results should go (direct to subdirectory UserData of your GenkNET clone)
 
     ############################
@@ -135,7 +134,6 @@ if __name__ == '__main__':
     filepath = os.path.abspath(__file__)
     #os.chdir(os.path.dirname(filepath))
     #os.chdir('..')
-    print os.getcwd()
     inputs = []
 
     for name in names:
@@ -152,7 +150,6 @@ if __name__ == '__main__':
         inputs = inputs[:4]
     else:
         inputs = inputs[5:]
-    print inputs
 
     if multi:
         po = Pool(processes=proc)

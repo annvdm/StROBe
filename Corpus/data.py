@@ -9,6 +9,9 @@ import os
 import numpy as np
 import stats
 
+strobe_dir = os.path.join(os.path.abspath('..'))
+
+
 def get_clusters(employment, **kwargs):
     '''
     Find the clusters for weekdays, saturday and sunday for a household member
@@ -17,8 +20,7 @@ def get_clusters(employment, **kwargs):
     '''
     #first go the the correct location
     cdir = os.getcwd()
-    PATH = '../Data/Aerts_Occupancy/Crosstables/'
-    os.chdir(PATH)
+    os.chdir(os.path.join(strobe_dir, 'Data', 'Aerts_Occupancy', 'Crosstables'))
     #create an empty dictionary
     keys = ['wkdy', 'sat', 'son']
     cluDict = dict()
@@ -45,9 +47,7 @@ def get_occDict(cluster, **kwargs):
     '''
     #first go the the correct location
     cdir = os.getcwd()
-    DATA_PATH = '../Data/Aerts_Occupancy'
-    PATH = DATA_PATH + '/Pattern' + str(cluster)
-    os.chdir(PATH)
+    os.chdir(os.path.join(strobe_dir, 'Data', 'Aerts_Occupancy', 'Pattern' + str(cluster)))
     # create an empty dictionary
     occDict = dict()
     ##########################################################################
@@ -90,8 +90,7 @@ def get_actDict(cluster, **kwargs):
     '''
     #first go the the correct location
     cdir = os.getcwd()
-    DATA_PATH = '../Data/Aerts_Activities'
-    os.chdir(DATA_PATH)
+    os.chdir(os.path.join(strobe_dir, 'Data', 'Aerts_Activities'))
     # create an empty dictionary
     actDict = dict()
     ##########################################################################
