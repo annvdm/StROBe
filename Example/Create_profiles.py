@@ -38,11 +38,7 @@ print destination
 print os.getcwd()
 if not os.path.isdir(destination):
     os.mkdir(destination)
-<<<<<<< HEAD
-Corpus.feeder.IDEAS_Feeder('test', 10, destination)
-=======
-#feeder.IDEAS_Feeder('test', 2, destination)
->>>>>>> Solve_relative_paths
+feeder.IDEAS_Feeder('test', 2, destination)
 
 plot_data('P')
 plt.show()

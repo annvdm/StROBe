@@ -382,14 +382,9 @@ class Household(object):
             # at a time-step of 1-minute for Uccle, Belgium
             # Since the data starts at midnight, a shift to 4am is necessary
             # so that it coincides with the occupancy data!!!
-            # the first 4 h are moved to the end. 
-<<<<<<< HEAD:Corpus/residential.py
-            os.chdir(os.path.join(strobe_dir, 'Data'))
-            file = open('Climate/irradiance.txt','r')
-=======
+            # the first 4 h are moved to the end.
 
             file = open(resource_filename('StROBe', 'Data/Climate/irradiance.txt'), 'r')
->>>>>>> Solve_relative_paths:StROBe/Corpus/residential.py
             data_pickle = file.read()
             file.close()
             irr = cPickle.loads(data_pickle)
@@ -505,7 +500,7 @@ class Household(object):
         '''
 
         #######################################################################
-        # we define setting types based on their setpoint temperatures 
+        # we define setting types based on their setpoint temperatures
         # when being active (1), sleeping (2) or absent (3).
         types = dict()
         types.update({'2': {1: 18.5, 2: 15.0, 3: 18.5}})
@@ -574,7 +569,7 @@ class Household(object):
         self.QCon = self.r_receptacles['QCon'] + self.r_lighting['QCon']
         self.mDHW = self.r_flows['mDHW']
 
-        #######################################################################        
+        #######################################################################
         # bring last 4 h to the front so that data starts at midnight
         self.sh_day = np.roll(self.sh_day, 24)
         self.sh_night = np.roll(self.sh_night, 24)

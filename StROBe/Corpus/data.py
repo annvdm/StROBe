@@ -12,11 +12,6 @@ from pkg_resources import resource_filename
 
 import stats
 
-<<<<<<< HEAD:Corpus/data.py
-strobe_dir = os.path.join(os.path.abspath('..'))
-
-=======
->>>>>>> Solve_relative_paths:StROBe/Corpus/data.py
 
 def get_clusters(employment, **kwargs):
     '''
@@ -24,16 +19,9 @@ def get_clusters(employment, **kwargs):
     of the given eployment type based on the Crosstables given at
     # http://homepages.vub.ac.be/~daerts/Occupancy.html
     '''
-<<<<<<< HEAD:Corpus/data.py
-    #first go the the correct location
-    cdir = os.getcwd()
-    os.chdir(os.path.join(strobe_dir, 'Data', 'Aerts_Occupancy', 'Crosstables'))
-    #create an empty dictionary
-=======
     # first go the the correct location
     PATH = resource_filename('StROBe', 'Data/Aerts_Occupancy/Crosstables')
     # create an empty dictionary
->>>>>>> Solve_relative_paths:StROBe/Corpus/data.py
     keys = ['wkdy', 'sat', 'son']
     cluDict = dict()
     ##########################################################################
@@ -57,16 +45,10 @@ def get_occDict(cluster, **kwargs):
     Aerts et al. as given at http://homepages.vub.ac.be/~daerts/Occupancy.html
     and stored in 'StROBe/Data/Aerts_Occupancy'.
     '''
-<<<<<<< HEAD:Corpus/data.py
-    #first go the the correct location
-    cdir = os.getcwd()
-    os.chdir(os.path.join(strobe_dir, 'Data', 'Aerts_Occupancy', 'Pattern' + str(cluster)))
-=======
     # first go the the correct location
 
     DATA_PATH = resource_filename('StROBe', 'Data/Aerts_Occupancy')
     PATH = DATA_PATH + '/Pattern' + str(cluster)
->>>>>>> Solve_relative_paths:StROBe/Corpus/data.py
     # create an empty dictionary
     occDict = dict()
     ##########################################################################
@@ -107,14 +89,8 @@ def get_actDict(cluster, **kwargs):
     Aerts et al. as given at http://homepages.vub.ac.be/~daerts/Activity.html
     and stored in 'StROBe/Data/Aerts_activity'.
     '''
-<<<<<<< HEAD:Corpus/data.py
-    #first go the the correct location
-    cdir = os.getcwd()
-    os.chdir(os.path.join(strobe_dir, 'Data', 'Aerts_Activities'))
-=======
     # first go the the correct location
     DATA_PATH = resource_filename('StROBe', 'Data/Aerts_Activities')
->>>>>>> Solve_relative_paths:StROBe/Corpus/data.py
     # create an empty dictionary
     actDict = dict()
     ##########################################################################
