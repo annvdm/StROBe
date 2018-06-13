@@ -10,5 +10,5 @@ setup(
     license='',
     author='Ruben Baetens',
     author_email='',
-    description=''
+    description='', install_requires=['numpy']
 )

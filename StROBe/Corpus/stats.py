@@ -5,8 +5,9 @@ Created on Wed Oct 09 11:57:02 2013
 @author: Ruben Baetens
 """
 
-import numpy as np
 import random
+
+import numpy as np
 
 import data
 
@@ -20,9 +21,10 @@ def get_probability(rnd, prob, p_type='cum'):
         prob = np.cumsum(prob)
         prob /= max(prob)
     idx = 1
-    while rnd >= prob[idx-1]:
+    while rnd >= prob[idx - 1]:
         idx += 1
     return idx
+
 
 def sum_dict(dict_a, dict_b):
     '''
@@ -37,27 +39,30 @@ def sum_dict(dict_a, dict_b):
         sum_dict = dict()
         for key in dict_a.keys():
             if dict_a[key] is None:
-                sum_dict.update({key:None})
+                sum_dict.update({key: None})
             elif key != 'time':
-                sum_dict.update({key:dict_a[key]+dict_b[key]})
+                sum_dict.update({key: dict_a[key] + dict_b[key]})
             else:
-                sum_dict.update({key:dict_a[key]})
+                sum_dict.update({key: dict_a[key]})
     # and return
     return sum_dict
+
 
 class MCSA(object):
     '''
     The MCSA class defines a Monte Carlo Survival Analysis
     '''
+
     # All object parameters are given in kwargs
     def __init__(self, cluster, **kwargs):
         # load the dataset of the cluster into ds
         ds = data.get_occDict(cluster)
         # and add them as class parameters
         self.OSS = ds['ss']
-        self.OPM = {1:ds['os_1'], 2:ds['os_2'], 3:ds['os_3']}
-        self.ODM = {1:ds['ol_1'], 2:ds['ol_2'], 3:ds['ol_3']}
-#        self.RED = ds['RED']
+        self.OPM = {1: ds['os_1'], 2: ds['os_2'], 3: ds['os_3']}
+        self.ODM = {1: ds['ol_1'], 2: ds['ol_2'], 3: ds['ol_3']}
+
+    #        self.RED = ds['RED']
 
     def startstate(self):
         '''
@@ -94,15 +99,16 @@ class DTMC(object):
     '''
     The DTMC class defines a Discrete-Time Markov Chain
     '''
+
     # All object parameters are given in kwargs
     def __init__(self, clusterDict, **kwargs):
         # load the dataset of the cluster into ds
         self.ds = dict()
         for i in range(5):
-            self.ds.update({i:data.get_actDict(clusterDict['wkdy'])})
-        self.ds.update({5:data.get_actDict(clusterDict['son'])})
-        self.ds.update({6:data.get_actDict(clusterDict['son'])})
+            self.ds.update({i: data.get_actDict(clusterDict['wkdy'])})
+        self.ds.update({5: data.get_actDict(clusterDict['son'])})
+        self.ds.update({6: data.get_actDict(clusterDict['son'])})
+
     def get_var(self, dow, act, step):
         # get the probability of the given activity for daytype dow at step
         return self.ds[dow][act][step]
-

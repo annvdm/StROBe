@@ -4,6 +4,7 @@
 """Simulate demand scenarios at buildings level."""
 
 import numpy as np
+
 from residential import Household
 
 
@@ -63,4 +64,3 @@ def simulate_scenarios(n_scen, ndays):
         mDHW[i, :] = family.mDHW
 
     return elec, mDHW, occupancy
-

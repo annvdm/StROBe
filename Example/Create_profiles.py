@@ -4,13 +4,10 @@ Description
 """
 import os
 import matplotlib.pyplot as plt
-import shutil
-from collections import OrderedDict
-from multiprocessing import Pool
 
 import pandas as pd
 
-import Corpus.feeder
+import StROBe.Corpus.feeder as feeder
 
 
 # Corpus.feeder.IDEAS_cluster()
@@ -38,7 +35,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 destination = os.path.join(dir_path, 'results')
 if not os.path.isdir(destination):
     os.mkdir(destination)
-# Corpus.feeder.IDEAS_Feeder('test', 10, destination)
+feeder.IDEAS_Feeder('test', 10, destination)
 
 plot_data('P')
 plt.show()
