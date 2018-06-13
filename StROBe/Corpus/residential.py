@@ -5,23 +5,22 @@ Created on Mon October 07 16:16:10 2013
 @author: Ruben Baetens
 """
 
-import sys
-import random
-import numpy as np
-import time
-import datetime
-import calendar
-import ast
-import os
 import cPickle
+import calendar
+import datetime
 import itertools
+import os
+import random
+import time
 
-import stats
+import numpy as np
+from pkg_resources import resource_filename
+
 import data
+import stats
+from StROBe.Data.Appliances import set_appliances
+from StROBe.Data.Households import households
 
-sys.path.append("..")
-from Data.Households import households
-from Data.Appliances import set_appliances
 
 
 strobe_dir = os.path.join(os.path.abspath('..'))
@@ -115,6 +114,7 @@ class Household(object):
                     clusters.append(clu_i)
             # and return the list of clusters
             return clusters
+
         # and run all
         self.members = members(**kwargs)
         self.apps = appliances()
@@ -123,7 +123,7 @@ class Household(object):
         # and return
         print 'Household-object created and parameterized.'
         print ' - Employment types are %s' % str(self.members)
-        summary = [] #loop dics and remove dubbles
+        summary = []  # loop dics and remove dubbles
         for member in self.clusters:
             summary += member.values()
         print ' - Set of clusters is %s' % str(list(set(summary)))
@@ -150,7 +150,7 @@ class Household(object):
         - Monday == 0 ... Sunday == 6
         '''
         # first we determine the first week of the depicted year
-        fdoy = datetime.datetime(year,1,1).weekday()
+        fdoy = datetime.datetime(year, 1, 1).weekday()
         fweek = range(7)[fdoy:]
         # whereafter we fill the complete year
         if ndays:
@@ -158,19 +158,20 @@ class Household(object):
         else:
             nday = 366 if calendar.isleap(year) else 365
 
-        day_of_week = (fweek+53*range(7))[:nday]
+        day_of_week = (fweek + 53 * range(7))[:nday]
         # and return the day_of_week for the entire year
         self.dow = day_of_week
         self.nday = nday
         return None
 
-    def __occupancy__(self, min_form = True, min_time = False):
+    def __occupancy__(self, min_form=True, min_time=False):
         '''
         Simulation of a number of days based on cluster 'BxDict'.
         - Including weekend days,
         - starting from a regular monday at 4:00 AM.
         '''
-        def check(occday, min_form = True, min_time = False):
+
+        def check(occday, min_form=True, min_time=False):
             '''
             We set a check which becomes True if the simulated day behaves
             according to the cluster, as a safety measure for impossible
@@ -182,12 +183,12 @@ class Household(object):
             shape = True
             if min_form:
                 location = np.zeros(1, dtype=int)
-                reduction = occday[0]*np.ones(1, dtype=int)
-                for i in range(len(occday)-1):
-                    if occday[i+1] != occday[i]:
-                        location = np.append(location, i+1)
-                        reduction = np.append(reduction,occday[i+1])
-#                shape = np.array_equal(reduction, RED)
+                reduction = occday[0] * np.ones(1, dtype=int)
+                for i in range(len(occday) - 1):
+                    if occday[i + 1] != occday[i]:
+                        location = np.append(location, i + 1)
+                        reduction = np.append(reduction, occday[i + 1])
+            #                shape = np.array_equal(reduction, RED)
 
             # script 2 ########################################################
             # And second we see if the chain has nu sub-30 min differences
@@ -196,8 +197,8 @@ class Household(object):
                 minlength = 99
                 for i in location:
                     j = 0
-                    while occday[i+j] == occday[i] and i+j < len(occday)-1:
-                        j = j+1
+                    while occday[i + j] == occday[i] and i + j < len(occday) - 1:
+                        j = j + 1
                     if j < minlength:
                         minlength = j
                 # and we neglect the very short presences of 20 min or less
@@ -218,7 +219,7 @@ class Household(object):
             # creating days while False, meaning while the simulated day does
             # not correspond to the agreed-on rules in check().
             daycheck = False
-            end = datetime.datetime.utcnow() + datetime.timedelta(seconds = 10)
+            end = datetime.datetime.utcnow() + datetime.timedelta(seconds=10)
             # defin the corresponding MCSA object from stats.py depicting a
             # Monte Carlo Survival Analysis object.
             SA = stats.MCSA(cluster)
@@ -234,7 +235,7 @@ class Household(object):
                 while tbin < 143:
                     tbin += 1
                     if dt == 0:
-                        occs[tbin] = SA.transition(occs[tbin-1], t48[tbin])
+                        occs[tbin] = SA.transition(occs[tbin - 1], t48[tbin])
                         dt = SA.duration(occs[tbin], t48[tbin]) - 1
                         # -1 is necessary, as the occupancy state already started
                     else:
@@ -260,7 +261,7 @@ class Household(object):
             # We start defining an array of correct length filled with the
             # least active state and loop to see if more-active people are
             # present at the depicted moment.
-            occs = int(3)*np.ones(len(occ[0]))
+            occs = int(3) * np.ones(len(occ[0]))
             for member in occ:
                 for to in range(len(member)):
                     if member[to] < occs[to]:
@@ -274,10 +275,9 @@ class Household(object):
         # We change the directory to to location where the data is stored,
         # and run the three type of days, ie. wkdy, sat and son succesively
         # by which we can create a typical week.
-        cdir = os.getcwd()
         occ_week = []
         for member in self.clusters:
-            startstate = 2 #4.00 AM
+            startstate = 2  # 4.00 AM
             wkdy = dayrun(startstate, member['wkdy'])
             sat = dayrun(wkdy[-1], member['sat'])
             son = dayrun(sat[-1], member['son'])
@@ -291,25 +291,24 @@ class Household(object):
         # repeating them every week and correcting for the first day of year,
         # including for the merged occupancy.
         bins = 144
-        tstart = bins*self.dow[0]
-        tstop = tstart + bins*self.nday
+        tstart = bins * self.dow[0]
+        tstop = tstart + bins * self.nday
         occ_year = []
         for line in range(len(occ_week)):
-            occ_year.append(np.tile(occ_week,54)[line][tstart:tstop])
+            occ_year.append(np.tile(occ_week, 54)[line][tstart:tstop])
         occ_merged = []
-        occ_merged.append(np.tile(occ_merg,54)[tstart:tstop])
+        occ_merged.append(np.tile(occ_merg, 54)[tstart:tstop])
 
         # output ##############################################################
         # chdir back to original and return the occupancy states to the class
         # object.
-        os.chdir(cdir)
         self.occ = occ_year
         self.occ_m = occ_merged
         # and print statements
         presence = [to for to in self.occ_m[0] if to < 2]
-        hours = len(presence)/6.
-        print ' - Total presence time is {0:.1f} out of {1} hours'.format(hours, self.nday*24)
-        print '\tbeing {:.1f} percent)'.format(hours*100/(self.nday*24))
+        hours = len(presence) / 6.
+        print ' - Total presence time is {0:.1f} out of {1} hours'.format(hours, self.nday * 24)
+        print '\tbeing {:.1f} percent)'.format(hours * 100 / (self.nday * 24))
         return None
 
     def __plugload__(self):
@@ -329,9 +328,9 @@ class Household(object):
             nmin = self.nday * 1440
             # determine all transitions of the appliances depending on the appliance
             # basic properties, ie. stochastic versus cycling power profile
-            power = np.zeros(nmin+1)
-            radi = np.zeros(nmin+1)
-            conv = np.zeros(nmin+1)
+            power = np.zeros(nmin + 1)
+            radi = np.zeros(nmin + 1)
+            conv = np.zeros(nmin + 1)
             nday = self.nday
             dow = self.dow
             result_n = dict()
@@ -347,25 +346,25 @@ class Household(object):
                     r_app = stats.sum_dict(r_app, r_appi)
                     n_app += n_appi
                 # and sum
-                result_n.update({app:n_app})
+                result_n.update({app: n_app})
                 power += r_app['P']
                 radi += r_app['QRad']
                 conv += r_app['QCon']
             # a new time axis for power output is to be created as a different
             # time step is used in comparison to occupancy
-            time = 4*60*60 + np.arange(0, (nmin+1)*60, 60)
+            time = 4 * 60 * 60 + np.arange(0, (nmin + 1) * 60, 60)
 
-            react = np.zeros(nmin+1)
+            react = np.zeros(nmin + 1)
 
-            result = {'time':time, 'occ':None, 'P':power, 'Q':react,
-                      'QRad':radi, 'QCon':conv, 'Wknds':None, 'mDHW':None}
+            result = {'time': time, 'occ': None, 'P': power, 'Q': react,
+                      'QRad': radi, 'QCon': conv, 'Wknds': None, 'mDHW': None}
 
             self.r_receptacles = result
             self.n_receptacles = result_n
 
             # output ##########################################################
             # only the power load is returned
-            load = int(np.sum(result['P'])/60/1000)
+            load = int(np.sum(result['P']) / 60 / 1000)
             print ' - Receptacle load is %s kWh' % str(load)
 
             return None
@@ -384,12 +383,17 @@ class Household(object):
             # Since the data starts at midnight, a shift to 4am is necessary
             # so that it coincides with the occupancy data!!!
             # the first 4 h are moved to the end. 
+<<<<<<< HEAD:Corpus/residential.py
             os.chdir(os.path.join(strobe_dir, 'Data'))
             file = open('Climate/irradiance.txt','r')
+=======
+
+            file = open(resource_filename('StROBe', 'Data/Climate/irradiance.txt'), 'r')
+>>>>>>> Solve_relative_paths:StROBe/Corpus/residential.py
             data_pickle = file.read()
             file.close()
             irr = cPickle.loads(data_pickle)
-            irr = np.roll(irr,-240) # brings first 4h to end
+            irr = np.roll(irr, -240)  # brings first 4h to end
             # script ##########################################################
             # a yearly simulation is basic, also in a unittest
             nday = self.nday
@@ -399,16 +403,16 @@ class Household(object):
             # the model is found on an ideal power level power_id depending on
             # irradiance level and occupancy (but not on light switching
             # behavior of occupants itself)
-            time = 4*60*60 + np.arange(0, (minutes+1)*60, 60)
-            to = -1 # time counter for occupancy
-            tl = -1 # time counter for minutes in lighting load
+            time = 4 * 60 * 60 + np.arange(0, (minutes + 1) * 60, 60)
+            to = -1  # time counter for occupancy
+            tl = -1  # time counter for minutes in lighting load
             power_max = 200
             irr_max = 200
-            pow_id = np.zeros(minutes+1)
-            prob_adj = 0.1 # hourly probability to adjust
-            pow_adj = 40 # power by which is adjusted
-            P = np.zeros(minutes+1)
-            Q = np.zeros(minutes+1)
+            pow_id = np.zeros(minutes + 1)
+            prob_adj = 0.1  # hourly probability to adjust
+            pow_adj = 40  # power by which is adjusted
+            P = np.zeros(minutes + 1)
+            Q = np.zeros(minutes + 1)
             for doy, step in itertools.product(range(nday), range(nbin)):
                 to += 1
                 for run in range(0, 10):
@@ -416,34 +420,34 @@ class Household(object):
                     if occ_m[to] > int(1) or (irr[tl] >= irr_max):
                         pow_id[tl] = 0
                     else:
-                        pow_id[tl] = power_max*(1 - irr[tl]/irr_max)
+                        pow_id[tl] = power_max * (1 - irr[tl] / irr_max)
                     # determine all transitions of appliances depending on
                     # the appliance basic properties, ie. stochastic versus
                     # cycling power profile
                     if occ_m[to] == 0:
                         P[tl] = pow_id[tl]
                     elif random.random() <= prob_adj:
-                        delta = P[tl-1] - pow_id[tl]
+                        delta = P[tl - 1] - pow_id[tl]
                         delta_min = np.abs(delta - pow_adj)
                         delta_plus = np.abs(delta + pow_adj)
-                        if delta > 0 and delta_min < np.abs(delta) :
-                            P[tl] = P[tl-1]-pow_adj
+                        if delta > 0 and delta_min < np.abs(delta):
+                            P[tl] = P[tl - 1] - pow_adj
                         elif delta < 0 and delta_plus < np.abs(delta):
-                            P[tl] = P[tl-1]+pow_adj
+                            P[tl] = P[tl - 1] + pow_adj
                         else:
-                            P[tl] = P[tl-1]
+                            P[tl] = P[tl - 1]
                     else:
-                        P[tl] = P[tl-1]
+                        P[tl] = P[tl - 1]
 
-            radi = P*0.55
-            conv = P*0.45
+            radi = P * 0.55
+            conv = P * 0.45
 
-            result = {'time':time, 'P':P, 'Q':Q, 'QRad':radi, 'QCon':conv}
+            result = {'time': time, 'P': P, 'Q': Q, 'QRad': radi, 'QCon': conv}
 
             self.r_lighting = result
             # output ##########################################################
             # only the power load is returned
-            load = int(np.sum(result['P'])/60/1000)
+            load = int(np.sum(result['P']) / 60 / 1000)
             print ' - Lighting load is %s kWh' % str(load)
 
             return None
@@ -463,7 +467,7 @@ class Household(object):
         nmin = self.nday * 1440
         # determine all transitions of the appliances depending on the appliance
         # basic properties, ie. stochastic versus cycling power profile
-        flow = np.zeros(nmin+1)
+        flow = np.zeros(nmin + 1)
         clusterDict = self.clusters[0]
         nday = self.nday
         dow = self.dow
@@ -473,23 +477,22 @@ class Household(object):
             # create the equipment object with data from dataset.py
             eq = Equipment(**set_appliances[tap])
             r_tap, n_tap = eq.simulate(nday, dow, clusterDict, occ_m)
-            result_n.update({tap:n_tap})
+            result_n.update({tap: n_tap})
             flow += r_tap['mDHW']
         # a new time axis for power output is to be created as a different
         # time step is used in comparison to occupancy
-        time = 4*60*60 + np.arange(0, (nmin+1)*60, 60)
+        time = 4 * 60 * 60 + np.arange(0, (nmin + 1) * 60, 60)
 
-        result = {'time':time, 'occ':None, 'P':None, 'Q':None,
-                  'QRad':None, 'QCon':None, 'Wknds':None, 'mDHW':flow}
+        result = {'time': time, 'occ': None, 'P': None, 'Q': None,
+                  'QRad': None, 'QCon': None, 'Wknds': None, 'mDHW': flow}
 
         self.r_flows = result
         self.n_flows = result_n
 
-
         # output ##########################################################
         # only the power load is returned
         load = np.sum(result['mDHW'])
-        loadpppd = int(load/self.nday/len(self.clusters))
+        loadpppd = int(load / self.nday / len(self.clusters))
         print ' - Draw-off is %s l/pp.day' % str(loadpppd)
 
         return None
@@ -505,23 +508,23 @@ class Household(object):
         # we define setting types based on their setpoint temperatures 
         # when being active (1), sleeping (2) or absent (3).
         types = dict()
-        types.update({'2' : {1:18.5, 2:15.0, 3:18.5}})
-        types.update({'3' : {1:20.0, 2:15.0, 3:19.5}})
-        types.update({'4' : {1:20.0, 2:11.0, 3:19.5}})
-        types.update({'5' : {1:20.0, 2:14.5, 3:15.0}})
-        types.update({'6' : {1:21.0, 2:20.5, 3:21.0}})
-        types.update({'7' : {1:21.5, 2:15.5, 3:21.5}})
+        types.update({'2': {1: 18.5, 2: 15.0, 3: 18.5}})
+        types.update({'3': {1: 20.0, 2: 15.0, 3: 19.5}})
+        types.update({'4': {1: 20.0, 2: 11.0, 3: 19.5}})
+        types.update({'5': {1: 20.0, 2: 14.5, 3: 15.0}})
+        types.update({'6': {1: 21.0, 2: 20.5, 3: 21.0}})
+        types.update({'7': {1: 21.5, 2: 15.5, 3: 21.5}})
         # and the probabilities these types occur based on Dutch research,
         # i.e. Leidelmeijer and van Grieken (2005).
-        types.update({'prob' : [0.16, 0.35, 0.08, 0.11, 0.05, 0.20]})
+        types.update({'prob': [0.16, 0.35, 0.08, 0.11, 0.05, 0.20]})
         # and given a type, denote which rooms are heated
         given = dict()
-        given.update({'2' : [['dayzone','bathroom']]})
-        given.update({'3' : [['dayzone'],['dayzone','bathroom'],['dayzone','nightzone']]})
-        given.update({'4' : [['dayzone'],['dayzone','nightzone']]})
-        given.update({'5' : [['dayzone']]})
-        given.update({'6' : [['dayzone','bathroom','nightzone']]})
-        given.update({'7' : [['dayzone','bathroom']]})
+        given.update({'2': [['dayzone', 'bathroom']]})
+        given.update({'3': [['dayzone'], ['dayzone', 'bathroom'], ['dayzone', 'nightzone']]})
+        given.update({'4': [['dayzone'], ['dayzone', 'nightzone']]})
+        given.update({'5': [['dayzone']]})
+        given.update({'6': [['dayzone', 'bathroom', 'nightzone']]})
+        given.update({'7': [['dayzone', 'bathroom']]})
 
         #######################################################################
         # select a type from the given types and probabilities
@@ -535,8 +538,8 @@ class Household(object):
 
         #######################################################################
         # create a profile for the heated rooms
-        shnon = 12*np.ones(len(self.occ_m[0])+1)
-        shset = np.hstack((self.occ_m[0],self.occ_m[0][-1]))
+        shnon = 12 * np.ones(len(self.occ_m[0]) + 1)
+        shset = np.hstack((self.occ_m[0], self.occ_m[0][-1]))
         for key in types[shtype].keys():
             for i in range(len(shset)):
                 if int(shset[i]) == key:
@@ -547,12 +550,12 @@ class Household(object):
         sh_settings = dict()
         for room in ['dayzone', 'nightzone', 'bathroom']:
             if room in shrooms:
-                sh_settings.update({room:shset})
+                sh_settings.update({room: shset})
             else:
-                sh_settings.update({room:shnon})
+                sh_settings.update({room: shnon})
         # and store
         self.sh_settings = sh_settings
-        print ' - Average comfort setting is %s Celsius' % str(round(np.average(sh_settings['dayzone']),2))
+        print ' - Average comfort setting is %s Celsius' % str(round(np.average(sh_settings['dayzone']), 2))
         return None
 
     def roundUp(self):
@@ -573,14 +576,14 @@ class Household(object):
 
         #######################################################################        
         # bring last 4 h to the front so that data starts at midnight
-        self.sh_day = np.roll(self.sh_day,24)
-        self.sh_night = np.roll(self.sh_night,24)
-        self.sh_bath = np.roll(self.sh_bath,24)
-        self.P = np.roll(self.P,240)
-        self.Q = np.roll(self.Q,240)
-        self.QRad = np.roll(self.QRad,240)
-        self.QCon = np.roll(self.QCon,240)
-        self.mDHW = np.roll(self.mDHW,240)
+        self.sh_day = np.roll(self.sh_day, 24)
+        self.sh_night = np.roll(self.sh_night, 24)
+        self.sh_bath = np.roll(self.sh_bath, 24)
+        self.P = np.roll(self.P, 240)
+        self.Q = np.roll(self.Q, 240)
+        self.QRad = np.roll(self.QRad, 240)
+        self.QCon = np.roll(self.QCon, 240)
+        self.mDHW = np.roll(self.mDHW, 240)
 
         #######################################################################
         # then we delete the old data structure to save space
@@ -593,18 +596,20 @@ class Household(object):
         # and end
         return None
 
-    def pickle(self):
+    def pickle(self, path):
         '''
         Pickle the generated profile and its results for storing later.
         '''
-        cPickle.dump(self, open(self.name+'.p','wb'))
+        cPickle.dump(self, open(path+'/'+self.name + '.p', 'wb'))
         return None
+
 
 class Equipment(object):
     '''
     Data records for appliance simulation based on generated activity and
     occupancy profiles
     '''
+
     # All object parameters are given in kwargs
     def __init__(self, **kwargs):
         # copy kwargs to object parameters
@@ -623,7 +628,7 @@ class Equipment(object):
             # stats.DTMC file with its data.
             len_cycle = self.cycle_length
             act = self.activity
-            if self.activity not in ('None','Presence'):
+            if self.activity not in ('None', 'Presence'):
                 actdata = stats.DTMC(clusterDict=clusterDict)
             else:
                 actdata = None
@@ -632,11 +637,11 @@ class Equipment(object):
             # a yearly simulation is basic, also in a unittest
             nbin = 144
             minutes = nday * 1440
-            to = -1 # time counter for occupancy
-            tl = -1 # time counter for load
-            left = -1 # time counter for appliance duration
+            to = -1  # time counter for occupancy
+            tl = -1  # time counter for load
+            left = -1  # time counter for appliance duration
             n_fl = 0
-            flow = np.zeros(minutes+1)
+            flow = np.zeros(minutes + 1)
             for doy, step in itertools.product(range(nday), range(nbin)):
                 dow_i = dow[doy]
                 to += 1
@@ -655,14 +660,14 @@ class Equipment(object):
                         # check if there is a statechange in the appliance
                         if random.random() < prob * self.cal:
                             n_fl += 1
-                            left = random.gauss(len_cycle, len_cycle/10)
+                            left = random.gauss(len_cycle, len_cycle / 10)
                             flow[tl] += self.standby_flow
                     else:
                         left += -1
                         flow[tl] += self.cycle_flow
 
-            r_fl = {'time':time, 'occ':None, 'P':None, 'Q':None, 'QRad':None,
-                      'QCon':None, 'Wknds':None, 'mDHW':flow}
+            r_fl = {'time': time, 'occ': None, 'P': None, 'Q': None, 'QRad': None,
+                    'QCon': None, 'Wknds': None, 'mDHW': flow}
 
             return r_fl, n_fl
 
@@ -677,7 +682,7 @@ class Equipment(object):
             # stats.DTMC file with its data.
             len_cycle = self.cycle_length
             act = self.activity
-            if self.activity not in ('None','Presence'):
+            if self.activity not in ('None', 'Presence'):
                 actdata = stats.DTMC(clusterDict=clusterDict)
             else:
                 actdata = None
@@ -686,12 +691,12 @@ class Equipment(object):
             # a yearly simulation is basic, also in a unittest
             nbin = 144
             minutes = nday * 1440
-            to = -1 # time counter for occupancy
-            tl = -1 # time counter for load
-            left = -1 # time counter for appliance duration
+            to = -1  # time counter for occupancy
+            tl = -1  # time counter for load
+            left = -1  # time counter for appliance duration
             n_eq = 0
-            P = np.zeros(minutes+1)
-            Q = np.zeros(minutes+1)
+            P = np.zeros(minutes + 1)
+            Q = np.zeros(minutes + 1)
             for doy, step in itertools.product(range(nday), range(nbin)):
                 dow_i = dow[doy]
                 to += 1
@@ -710,14 +715,14 @@ class Equipment(object):
                         # check if there is a statechange in the appliance
                         if random.random() < prob * self.cal:
                             n_eq += 1
-                            left = random.gauss(len_cycle, len_cycle/10)
+                            left = random.gauss(len_cycle, len_cycle / 10)
                             P[tl] += self.standby_power
                     else:
                         left += -1
                         P[tl] += self.cycle_power
 
-            r_eq = {'time':time, 'occ':None, 'P':P, 'Q':Q, 'QRad':P*self.frad,
-                      'QCon':P*self.fconv, 'Wknds':None, 'mDHW':None}
+            r_eq = {'time': time, 'occ': None, 'P': P, 'Q': Q, 'QRad': P * self.frad,
+                    'QCon': P * self.fconv, 'Wknds': None, 'mDHW': None}
 
             return r_eq, n_eq
 
@@ -727,12 +732,12 @@ class Equipment(object):
             average clycle length
             '''
 
-            nbin = nday*24*60
-            P = np.zeros(nbin+1)
-            Q = np.zeros(nbin+1)
+            nbin = nday * 24 * 60
+            P = np.zeros(nbin + 1)
+            Q = np.zeros(nbin + 1)
             n_eq = 0
-            left = random.gauss(self.delay, self.delay/4)
-            for tl in range(nbin+1):
+            left = random.gauss(self.delay, self.delay / 4)
+            for tl in range(nbin + 1):
                 if left <= 0:
                     n_eq += 1
                     left += self.cycle_length
@@ -741,13 +746,13 @@ class Equipment(object):
                     left += -1
                     P[tl] = self.standby_power
 
-            r_eq = {'time':time, 'occ':None, 'P':P, 'Q':Q, 'QRad':P*self.frad,
-                      'QCon':P*self.fconv, 'Wknds':None, 'mDHW':None}
+            r_eq = {'time': time, 'occ': None, 'P': P, 'Q': Q, 'QRad': P * self.frad,
+                    'QCon': P * self.fconv, 'Wknds': None, 'mDHW': None}
 
             return r_eq, n_eq
 
         if self.type == 'appliance':
-            #check if the equipment is an appliance instead of tapping point
+            # check if the equipment is an appliance instead of tapping point
             if self.delay == 0:
                 r_app, n_app = stochastic_load(self, nday, dow, cluster, occ)
             else:

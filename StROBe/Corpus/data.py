@@ -6,11 +6,17 @@ Created on Thu Feb 06 09:48:07 2014
 """
 
 import os
+
 import numpy as np
+from pkg_resources import resource_filename
+
 import stats
 
+<<<<<<< HEAD:Corpus/data.py
 strobe_dir = os.path.join(os.path.abspath('..'))
 
+=======
+>>>>>>> Solve_relative_paths:StROBe/Corpus/data.py
 
 def get_clusters(employment, **kwargs):
     '''
@@ -18,26 +24,32 @@ def get_clusters(employment, **kwargs):
     of the given eployment type based on the Crosstables given at
     # http://homepages.vub.ac.be/~daerts/Occupancy.html
     '''
+<<<<<<< HEAD:Corpus/data.py
     #first go the the correct location
     cdir = os.getcwd()
     os.chdir(os.path.join(strobe_dir, 'Data', 'Aerts_Occupancy', 'Crosstables'))
     #create an empty dictionary
+=======
+    # first go the the correct location
+    PATH = resource_filename('StROBe', 'Data/Aerts_Occupancy/Crosstables')
+    # create an empty dictionary
+>>>>>>> Solve_relative_paths:StROBe/Corpus/data.py
     keys = ['wkdy', 'sat', 'son']
     cluDict = dict()
     ##########################################################################
     # we find the cluster for each of the daytypes for the given employment
     # in 'Crosstable_employment.txt'
     for key in keys:
-        order = ['U12','FTE','PTE','Unemployed','Retired','School']
+        order = ['U12', 'FTE', 'PTE', 'Unemployed', 'Retired', 'School']
         emp_i = order.index(employment)
-        data = np.loadtxt('Crosstable_Employment_'+key+'.txt', float).T[emp_i]
+        data = np.loadtxt(PATH+'/Crosstable_Employment_' + key + '.txt', float).T[emp_i]
         rnd = np.random.random()
         cluster = stats.get_probability(rnd, data[1:], p_type='prob')
-        cluDict.update({key:cluster})
+        cluDict.update({key: cluster})
     ##########################################################################
     # and return the final cluster id's
-    os.chdir(cdir)
     return cluDict
+
 
 def get_occDict(cluster, **kwargs):
     '''
@@ -45,42 +57,49 @@ def get_occDict(cluster, **kwargs):
     Aerts et al. as given at http://homepages.vub.ac.be/~daerts/Occupancy.html
     and stored in 'StROBe/Data/Aerts_Occupancy'.
     '''
+<<<<<<< HEAD:Corpus/data.py
     #first go the the correct location
     cdir = os.getcwd()
     os.chdir(os.path.join(strobe_dir, 'Data', 'Aerts_Occupancy', 'Pattern' + str(cluster)))
+=======
+    # first go the the correct location
+
+    DATA_PATH = resource_filename('StROBe', 'Data/Aerts_Occupancy')
+    PATH = DATA_PATH + '/Pattern' + str(cluster)
+>>>>>>> Solve_relative_paths:StROBe/Corpus/data.py
     # create an empty dictionary
     occDict = dict()
     ##########################################################################
     # first we load the occupancy start states 'oss' from StartStates.txt
     ss = dict()
-    data = np.loadtxt('StartStates.txt', float)
+    data = np.loadtxt(PATH+'/StartStates.txt', float)
     for i in range(len(data)):
-        ss.update({str(i+1):data[i]})
+        ss.update({str(i + 1): data[i]})
     # and add the 'oss' data to the occupancy dictionary
-    occDict.update({'ss':ss})
+    occDict.update({'ss': ss})
     ##########################################################################
     # Second we load the occupancy transitions state probabilities 'osn'
     # from TransitionProbability.txt
-    data = np.loadtxt('TransitionProbability.txt', float)
+    data = np.loadtxt(PATH+'/TransitionProbability.txt', float)
     for i in range(3):
         os_i = dict()
         for j in range(48):
-            os_i.update({str(j+1):data[i*48+j]})
+            os_i.update({str(j + 1): data[i * 48 + j]})
         # and add the 'osn_i' data to the occupancy dictionary
-        occDict.update({'os_'+str(i+1):os_i})
+        occDict.update({'os_' + str(i + 1): os_i})
     ##########################################################################
     # Third we load the Markov time density 'ol' from DurationProbability.txt
-    data = np.loadtxt('DurationProbability.txt', float)
+    data = np.loadtxt(PATH+'/DurationProbability.txt', float)
     for i in range(3):
         ol_i = dict()
         for j in range(48):
-            ol_i.update({str(j+1):data[i*48+j]})
+            ol_i.update({str(j + 1): data[i * 48 + j]})
         # and add the 'osn_i' data to the occupancy dictionary
-        occDict.update({'ol_'+str(i+1):ol_i})
+        occDict.update({'ol_' + str(i + 1): ol_i})
     ##########################################################################
     # and return the final occDict
-    os.chdir(cdir)
     return occDict
+
 
 def get_actDict(cluster, **kwargs):
     '''
@@ -88,24 +107,28 @@ def get_actDict(cluster, **kwargs):
     Aerts et al. as given at http://homepages.vub.ac.be/~daerts/Activity.html
     and stored in 'StROBe/Data/Aerts_activity'.
     '''
+<<<<<<< HEAD:Corpus/data.py
     #first go the the correct location
     cdir = os.getcwd()
     os.chdir(os.path.join(strobe_dir, 'Data', 'Aerts_Activities'))
+=======
+    # first go the the correct location
+    DATA_PATH = resource_filename('StROBe', 'Data/Aerts_Activities')
+>>>>>>> Solve_relative_paths:StROBe/Corpus/data.py
     # create an empty dictionary
     actDict = dict()
     ##########################################################################
     # first we define the dictionary used as legend for the load file
-    act = {0:'pc', 1:'food', 2:'vacuum', 3:'iron', 4:'tv', 5:'audio',
-           6:'dishes', 7:'washing', 8:'drying', 9:'shower'}
+    act = {0: 'pc', 1: 'food', 2: 'vacuum', 3: 'iron', 4: 'tv', 5: 'audio',
+           6: 'dishes', 7: 'washing', 8: 'drying', 9: 'shower'}
     ##########################################################################
     # Second we load the activity proclivity functions 'agn'
     # from Patter*cluster*.txt
-    FILNAM = 'Pattern'+str(cluster)+'.txt'
-    data = np.loadtxt(FILNAM, float)
+    FILNAM = '/Pattern' + str(cluster) + '.txt'
+    data = np.loadtxt(DATA_PATH+FILNAM, float)
     for i in range(10):
-        actDict.update({act[i]:data.T[i]})
+        actDict.update({act[i]: data.T[i]})
     ##########################################################################
     # and return the final actDict
-    actDict.update({'period':600, 'steps':144})
-    os.chdir(cdir)
+    actDict.update({'period': 600, 'steps': 144})
     return actDict
