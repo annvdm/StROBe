@@ -119,7 +119,7 @@ if __name__ == '__main__':
 
     multi = True  # Choose True to enable multiprocessing
     part = 'Bram'  # or 'Annelies'
-    proc = None  # Number of simultaneous calculations
+    proc = 4  # Number of simultaneous calculations
 
     source = os.path.abspath('GenkNET')
     # Where results of this file are saved (keep the Example/GenkNET structure, but change the rest accordingly)
@@ -132,7 +132,7 @@ if __name__ == '__main__':
 
     data_path = os.path.join(source, 'GenkNeighborhoods.txt')
     neighbdata = readData(data_path)
-    names = getNeighbNames(neighbdata)[:2]
+    names = getNeighbNames(neighbdata)
     # print neighbdata
 
     filepath = os.path.abspath(__file__)
@@ -150,7 +150,7 @@ if __name__ == '__main__':
         print("{: >20} {: >20} {: >20}".format(name, nametype, number))
     #
     if part == 'Bram':
-        inputs = inputs[:4]
+        inputs = inputs[2:4]
     else:
         inputs = inputs[5:]
 
