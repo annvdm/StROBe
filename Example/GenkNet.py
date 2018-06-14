@@ -102,6 +102,15 @@ def makeStrobe(data):
         cf.IDEAS_Feeder(name=buildingType, nBui=data[buildingType], path=path)
 
 
+def removePFiles(path):
+    for root, dirs, files in os.walk(path):
+        for currentFile in files:
+            print "processing file: " + currentFile
+            exts = ('.p')
+            if any(currentFile.lower().endswith(ext) for ext in exts):
+                os.remove(os.path.join(root, currentFile))
+
+
 if __name__ == '__main__':
 
     ############################
@@ -110,7 +119,7 @@ if __name__ == '__main__':
 
     multi = True  # Choose True to enable multiprocessing
     part = 'Bram'  # or 'Annelies'
-    proc = 3  # Number of simultaneous calculations
+    proc = None  # Number of simultaneous calculations
 
     source = os.path.abspath('GenkNET')
     # Where results of this file are saved (keep the Example/GenkNET structure, but change the rest accordingly)
@@ -155,3 +164,5 @@ if __name__ == '__main__':
     if not os.path.isdir(target):
         os.mkdir(target)
     collecttxt(target, source)
+
+    removePFiles(target)
