@@ -47,11 +47,11 @@ def getNumbers(data, neighbname, buiType, maxNr=50):
     outName = "{}_{}".format(neighbname, buiType)
 
     # print data
-    print 'buiType {}'.format(buiType)
-    print 'neighbname {}'.format(buiType)
+    #print 'buiType {}'.format(buiType)
+    #print 'neighbname {}'.format(buiType)
     number = data['Number' + str(buiType)][neighbname]
     outNumber = min(number, maxNr)
-    print 'Number ' + str(outNumber)
+    #print 'Number ' + str(outNumber)
 
     return outName, outNumber
 
@@ -86,20 +86,28 @@ def makeStrobe(data):
     """
     Perform StROBe simulation for one neighborhood
     :param data: Dictionary with neighborhood and simulation data
+        dict contains labels:
+        - name
+        - type
+        - path
+        - number
     :return:
     """
 
     name = data['name']
-    types = ['D', 'SD', 'T']
+    type = data['type']
+    number = data['number']
+    path = data['path']
 
-    parentpath = os.path.abspath('GenkNET/{}'.format(name))
+    if not os.path.isdir(path):
+        os.makedirs(path)
 
-    print '*** Path to save all files: {}'.format(parentpath)
-    for buildingType in types:
-        path = os.path.join(parentpath, buildingType)
-        if not os.path.isdir(path):
-            os.makedirs(path)
-        cf.IDEAS_Feeder(name=buildingType, nBui=data[buildingType], path=path)
+    print '*** Path to save all files: {}'.format(path)
+    cf.IDEAS_Feeder(name='bui_{}_{}'.format(name, type),
+                    nBui=number,
+                    path=path)
+
+    removePFiles(path)
 
 
 def removePFiles(path):
@@ -140,22 +148,28 @@ if __name__ == '__main__':
     #os.chdir('..')
     inputs = []
 
-    for name in names:
-        data = OrderedDict()
-        for type in ['D', 'SD', 'T']:
-            nametype, number = getNumbers(data=neighbdata, neighbname=name, buiType=type)
-            data[type] = number
-        data['name'] = name
-        inputs.append(data)
-        print("{: >20} {: >20} {: >20}".format(name, nametype, number))
-    #
     if part == 'Bram':
-        inputs = inputs[2:4]
-    else:
-        inputs = inputs[5:]
+        names = names[:4]
+    elif part == 'Annelies':
+        names = names[5:]
+
+    for name in names:
+        for buiType in ['D', 'SD', 'T']:
+            data = dict()
+            print buiType
+            _, number = getNumbers(data=neighbdata, neighbname=name, buiType=buiType)
+            data['type'] = buiType
+            data['name'] = name
+            data['number'] = number
+            data['path'] = os.path.join(target, name, buiType)
+            inputs.append(data)
+            print 'Created case for {} building type {} with {} buildings'.format(name, buiType, number)
+
+
+    print inputs
 
     if multi:
-        po = Pool(processes=proc)
+        po = Pool()
         po.map(makeStrobe, inputs)
     else:
         for inp in inputs:
@@ -164,5 +178,3 @@ if __name__ == '__main__':
     if not os.path.isdir(target):
         os.mkdir(target)
     collecttxt(target, source)
-
-    removePFiles(target)
