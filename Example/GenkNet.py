@@ -140,10 +140,10 @@ if __name__ == '__main__':
         inputs.append(data)
         print("{: >20} {: >20} {: >20}".format(name, nametype, number))
     #
-    # if part == 'Bram':
-    #     inputs = inputs[:4]
-    # else:
-    #     inputs = inputs[5:]
+    if part == 'Bram':
+        inputs = inputs[:4]
+    else:
+        inputs = inputs[5:]
 
     if multi:
         po = Pool(processes=proc)
