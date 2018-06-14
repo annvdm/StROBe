@@ -156,7 +156,7 @@ if __name__ == '__main__':
     for name in names:
         for buiType in ['D', 'SD', 'T']:
             data = dict()
-            print buiType
+            # print buiType
             _, number = getNumbers(data=neighbdata, neighbname=name, buiType=buiType)
             data['type'] = buiType
             data['name'] = name
@@ -169,7 +169,7 @@ if __name__ == '__main__':
     print inputs
 
     if multi:
-        po = Pool()
+        po = Pool(processes=4)
         po.map(makeStrobe, inputs)
     else:
         for inp in inputs:
