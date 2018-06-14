@@ -109,7 +109,7 @@ if __name__ == '__main__':
     ############################
 
     multi = True  # Choose True to enable multiprocessing
-    # part = 'Bram'  # or 'Annelies'
+    part = 'Bram'  # or 'Annelies'
     proc = 3  # Number of simultaneous calculations
 
     source = os.path.abspath('GenkNET')
@@ -121,7 +121,7 @@ if __name__ == '__main__':
     ##     CODE FROM HERE     ##
     ############################
 
-    data_path = os.path.join(source, 'GenkNeighborhoods_test.txt')
+    data_path = os.path.join(source, 'GenkNeighborhoods.txt')
     neighbdata = readData(data_path)
     names = getNeighbNames(neighbdata)[:2]
     # print neighbdata
