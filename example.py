@@ -1,14 +1,9 @@
 import os
 
-import Corpus.feeder as fee
-import Corpus.residential as res
-
-strobeDir = os.path.dirname(os.path.realpath(__file__))
+import StROBe.Corpus.feeder as fee
+import StROBe.Corpus.residential as res
 cleanup = True
 
-os.chdir(strobeDir + '\\Corpus\\')
-
-os.chdir(strobeDir + "\\Data\\")
 
 # Test Household.parametrize() and .simulate()
 family = res.Household("Example family")
@@ -16,7 +11,7 @@ family.parameterize()
 family.simulate()
 
 # Test feeder
-fee.IDEAS_Feeder('Example', 5, strobeDir)
+fee.IDEAS_Feeder('Example', 5, os.getcwd())
 
 # cleanup
 if cleanup:
